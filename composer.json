@@ -1,0 +1,23 @@
+{
+    "name": "ivopetkov/form-bearframework-addon",
+    "description": "Form addon for Bear Framework",
+    "keywords": ["form", "addon", "Bear Framework"],
+    "homepage": "https://github.com/ivopetkov/form-bearframework-addon",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ivo Petkov",
+            "email": "ivo@ivopetkov.com",
+            "homepage": "http://ivopetkov.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.0",
+        "bearframework/bearframework": "*",
+        "ivopetkov/html-server-components-bearframework-addon": "*",
+        "ivopetkov/html5-dom-document": "*"
+    },
+    "autoload": {
+        "files": ["autoload.php"]
+    }
+}
