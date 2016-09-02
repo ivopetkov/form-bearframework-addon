@@ -15,7 +15,7 @@
         "php": ">=5.5.0",
         "bearframework/bearframework": "*",
         "ivopetkov/html-server-components-bearframework-addon": "*",
-        "ivopetkov/html5-dom-document": "*"
+        "ivopetkov/html5-dom-document-php": "*"
     },
     "autoload": {
         "files": ["autoload.php"]
