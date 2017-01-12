@@ -13,14 +13,18 @@
     ],
     "require": {
         "php": ">=5.5.0",
-        "bearframework/bearframework": "0.8.*|0.9.*",
+        "bearframework/bearframework": "dev-master",
         "ivopetkov/html-server-components-bearframework-addon": "0.2.*|0.3.*",
-        "ivopetkov/html5-dom-document-php": "0.3.*|0.4.*"
+        "ivopetkov/html5-dom-document-php": "0.3.*|0.4.*",
+        "ivopetkov/server-requests-bearframework-addon": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "^4.8"
     },
     "autoload": {
+        "psr-4": {
+            "IvoPetkov\\BearFrameworkAddons\\": "classes/"
+        },
         "files": ["autoload.php"]
     }
 }
