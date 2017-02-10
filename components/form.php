@@ -10,14 +10,14 @@
 use BearFramework\App;
 
 $app = App::get();
-$context = $app->getContext(__FILE__);
+$context = $app->context->get(__FILE__);
 
 $id = md5(uniqid() . 'form');
 $component->src = "file:" . $component->filename;
 unset($component->filename);
-$componentAsHTML = (string) $component;
+$componentHTML = (string) $component;
 $form = new IvoPetkov\BearFrameworkAddons\Form();
-$output = $app->components->process($componentAsHTML, ['variables' => ['form' => $form]]);
+$output = $app->components->process($componentHTML, ['variables' => ['form' => $form]]);
 $domDocument = new IvoPetkov\HTML5DOMDocument();
 $domDocument->loadHTML($output);
 
@@ -26,25 +26,18 @@ if ($formElement) {
     $formElement->setAttribute('data-form-id', $id);
 }
 $serverData = [
-    'componentHTML' => $componentAsHTML
+    'componentHTML' => $componentHTML
 ];
 
 $encodedServerData = json_encode($serverData);
 $serverDataKey = md5($encodedServerData);
-$temp = $app->data->get([
-    'key' => '.temp/form/' . $serverDataKey,
-    'result' => ['key']
-        ]);
-if (!isset($temp['key'])) {
-    $app->data->set([
-        'key' => '.temp/form/' . $serverDataKey,
-        'body' => $encodedServerData
-    ]);
+if (!$app->data->exists('.temp/form/' . $serverDataKey)) {
+    $app->data->set($app->data->make('.temp/form/' . $serverDataKey, $encodedServerData));
 }
 
 $style = 'background:rgba(0,0,0,.8);arrow-size:8px;';
 
-$getTooltipData = function($style) use ($domDocument) {
+$getTooltipData = function($style) use (&$domDocument) {
     $arrowSize = null;
     $backgroundColor = null;
     $styleParts = explode(';', $style);
