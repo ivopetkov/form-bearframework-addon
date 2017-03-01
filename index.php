@@ -68,6 +68,14 @@ $app->serverRequests
                                     'element' => (string) $e->elementName,
                                 ]
                             ]);
+                        } catch (\Exception $e) {
+                            \BearFramework\App\ErrorHandler::handleException($e);
+                            return json_encode([
+                                'status' => '0',
+                                'error' => [
+                                    'message' => 'Error occurred. Please, try again later.'
+                                ]
+                            ]);
                         }
                         return json_encode([
                             'status' => '1',
