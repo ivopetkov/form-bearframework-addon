@@ -45,22 +45,29 @@ ivoPetkov.bearFrameworkAddons.form = (function () {
                 data['values'] = JSON.stringify(values);
 
                 var event = document.createEvent('Event');
-                event.initEvent('submitstarted', false, false);
+                event.initEvent('requestsent', false, false);
                 formElement.dispatchEvent(event);
+                
+                var responseReceived = function(){
+                    var event = document.createEvent('Event');
+                    event.initEvent('responsereceived', false, false);
+                    formElement.dispatchEvent(event);
+                }
 
                 ivoPetkov.bearFrameworkAddons.serverRequests.send('ivopetkov-form', data, function (responseText) {
+                    responseReceived();
                     forms[id].status = 0;
                     var response = JSON.parse(responseText);
                     if (typeof response.status !== 'undefined') {
                         if (response.status === '0') {
-                            if (response.error.element.length > 0) {
+                            if (typeof response.error.element !== 'undefined' && response.error.element.length > 0) {
                                 var invalidElement = formElement.querySelector('[name="' + response.error.element + '"]');
                                 if (invalidElement !== null) {
                                     invalidElement.focus();
                                 }
                             }
-                            if (response.error.message.length > 0) {
-                                if (response.error.element.length > 0 && invalidElement !== null) {
+                            if (typeof response.error.message !== 'undefined' && response.error.message.length > 0) {
+                                if (typeof response.error.element !== 'undefined' && response.error.element.length > 0 && invalidElement !== null) {
                                     createTooltip(id, invalidElement, response.error.message);
                                 } else {
                                     createTooltip(id, formElement, response.error.message);
@@ -73,6 +80,9 @@ ivoPetkov.bearFrameworkAddons.form = (function () {
                             formElement.dispatchEvent(event);
                         }
                     }
+                }, function () {
+                    responseReceived();
+                    createTooltip(id, formElement, 'Error occurred. Please, try again later.');
                 });
 
             }
@@ -170,10 +180,17 @@ ivoPetkov.bearFrameworkAddons.form = (function () {
                     (f.bind(this))(event);
                 });
             }
-            var onSubmitStartedValue = formElement.getAttribute('onsubmitstarted');
-            if (onSubmitStartedValue !== null) {
-                formElement.addEventListener('submitstarted', function (event) {
-                    var f = (new Function("return function(event){" + onSubmitStartedValue + "}"))();
+            var onRequestSentValue = formElement.getAttribute('onrequestsent');
+            if (onRequestSentValue !== null) {
+                formElement.addEventListener('requestsent', function (event) {
+                    var f = (new Function("return function(event){" + onRequestSentValue + "}"))();
+                    (f.bind(this))(event);
+                });
+            }
+            var onResponseReceivedValue = formElement.getAttribute('onresponsereceived');
+            if (onResponseReceivedValue !== null) {
+                formElement.addEventListener('responsereceived', function (event) {
+                    var f = (new Function("return function(event){" + onResponseReceivedValue + "}"))();
                     (f.bind(this))(event);
                 });
             }
