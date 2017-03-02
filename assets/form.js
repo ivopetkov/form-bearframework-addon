@@ -49,6 +49,7 @@ ivoPetkov.bearFrameworkAddons.form = (function () {
                 formElement.dispatchEvent(event);
                 
                 var responseReceived = function(){
+                    forms[id].status = 0;
                     var event = document.createEvent('Event');
                     event.initEvent('responsereceived', false, false);
                     formElement.dispatchEvent(event);
@@ -56,7 +57,6 @@ ivoPetkov.bearFrameworkAddons.form = (function () {
 
                 ivoPetkov.bearFrameworkAddons.serverRequests.send('ivopetkov-form', data, function (responseText) {
                     responseReceived();
-                    forms[id].status = 0;
                     var response = JSON.parse(responseText);
                     if (typeof response.status !== 'undefined') {
                         if (response.status === '0') {
