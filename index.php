@@ -24,6 +24,35 @@ $context->assets
 $app->components
         ->addAlias('form', 'file:' . $context->dir . '/components/form.php');
 
+$app->routes
+        ->add('/ivopetkov-form-files-upload/', function() use ($app) {
+            $response = [];
+            for ($i = 0; $i < 100; $i++) {
+                $fileItem = $app->request->formData->getFile('file' . $i);
+                if ($fileItem === null) {
+                    break;
+                }
+                if (is_file($fileItem->filename)) {
+                    $filename = md5(uniqid() . $fileItem->filename) . '.tmp';
+                    $newFilepath = $app->data->getFilename('.temp/form/files/' . $filename);
+                    $pathInfo = pathinfo($newFilepath);
+                    if (isset($pathInfo['dirname'])) {
+                        if (!is_dir($pathInfo['dirname'])) {
+                            mkdir($pathInfo['dirname'], 0777, true);
+                        }
+                    }
+                    rename($fileItem->filename, $newFilepath);
+                    $response[] = [
+                        'value' => $fileItem->value,
+                        'filename' => $filename,
+                        'size' => $fileItem->size,
+                        'type' => $fileItem->type
+                    ];
+                }
+            }
+            return new App\Response\JSON(json_encode($response));
+        }, ['POST']);
+
 $app->serverRequests
         ->add('ivopetkov-form', function($data) use ($app) {
             if (isset($data['serverData'], $data['values'])) {
@@ -40,10 +69,33 @@ $app->serverRequests
                     $form = new Form();
                     $app->components->process($serverData['componentHTML'], ['variables' => ['form' => $form]]);
                     if (is_callable($form->onSubmit)) {
-                        $tempValues = $data['values'];
-                        $values = json_decode($tempValues, true);
-                        if (!is_array($values)) {
-                            $values = [];
+                        $tempValues = json_decode($data['values'], true);
+                        $values = [];
+                        if (is_array($tempValues)) {
+                            foreach ($tempValues as $tempValueName => $tempValueData) {
+                                if (isset($tempValueData['type'], $tempValueData['value'])) {
+                                    if ($tempValueData['type'] === 'file') {
+                                        $filesData = json_decode($tempValueData['value'], true);
+                                        if (is_array($filesData)) {
+                                            $okCount = 0;
+                                            foreach ($filesData as $i => $fileData) {
+                                                if (is_array($fileData) && isset($fileData['filename']) && preg_match('/^[a-f0-9]{32}\.tmp$/', $fileData['filename']) === 1) {
+                                                    $okCount++;
+                                                    $filesData[$i]['filename'] = $app->data->getFilename('.temp/form/files/' . $fileData['filename']);
+                                                }
+                                            }
+                                            if (sizeof($filesData) === $okCount) {
+                                                $values[$tempValueName] = json_encode($filesData);
+                                            }
+                                        }
+                                        if (!isset($values[$tempValueName])) {
+                                            $values[$tempValueName] = '';
+                                        }
+                                    } else {
+                                        $values[$tempValueName] = $tempValueData['value'];
+                                    }
+                                }
+                            }
                         }
 
                         $errorsList = [];

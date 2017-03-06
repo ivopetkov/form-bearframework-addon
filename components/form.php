@@ -25,6 +25,7 @@ $formElement = $domDocument->querySelector('form');
 if ($formElement) {
     $formElement->setAttribute('data-form-id', $id);
 }
+$formElement->setAttribute('onsubmit', "this.submit();event.preventDefault();return false;");
 $serverData = [
     'componentHTML' => $componentHTML
 ];
@@ -66,7 +67,7 @@ $getTooltipData = function($style) use (&$domDocument) {
         $backgroundColor = 'rgba(0,0,0,.9)';
     }
 
-    $elementStyle = 'display:inline-block;background:' . $backgroundColor . ';border-radius:2px;font-family:Arial;font-size:14px;color:#fff;padding:13px 15px;position:absolute;z-index:10000;max-width:220px;user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none;cursor:default;' . $style;
+    $elementStyle = 'display:inline-block;background:' . $backgroundColor . ';border-radius:2px;font-family:Arial;font-size:14px;color:#fff;padding:13px 15px;position:absolute;z-index:10030000;max-width:220px;user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none;cursor:default;' . $style;
     $elementBeforeStyle = 'border:solid;border-color:' . $backgroundColor . ' transparent;border-width:' . $arrowSize . ' ' . $arrowSize . ' 0 ' . $arrowSize . ';bottom:-' . $arrowSize . ';content:"";left:calc(50% - ' . $arrowSize . ');position:absolute;';
 
     $tooltipClassName = 'ipform' . md5($elementStyle . $elementBeforeStyle);
@@ -82,10 +83,12 @@ $getTooltipData = function($style) use (&$domDocument) {
 
 $initializeData = [
     'serverData' => $serverDataKey,
-    'errorTooltipData' => $getTooltipData('')
+    'errorTooltipData' => $getTooltipData(''),
+    'filesUploadUrl' => $app->urls->get('/ivopetkov-form-files-upload/')
 ];
 
-$html = '<script>var script=document.createElement(\'script\');script.src=\'' . $context->assets->getUrl('assets/form.js') . '\';script.onload=function(){ivoPetkov.bearFrameworkAddons.form.initialize(\'' . $id . '\',' . json_encode($initializeData) . ');};document.head.appendChild(script);</script>';
+$disableSubmitJs = 'var formElement = document.querySelector(\'form[data-form-id="' . $id . '"]\');if(formElement){formElement.submit=function(){};}';
+$html = '<script>' . $disableSubmitJs . 'var script=document.createElement(\'script\');script.src=\'' . $context->assets->getUrl('assets/form.js') . '\';script.onload=function(){ivoPetkov.bearFrameworkAddons.form.initialize(\'' . $id . '\',' . json_encode($initializeData) . ');};document.head.appendChild(script);</script>';
 
 $domDocument->insertHTML($html);
 echo $domDocument->saveHTML();

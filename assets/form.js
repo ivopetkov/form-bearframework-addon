@@ -31,59 +31,129 @@ ivoPetkov.bearFrameworkAddons.form = (function () {
 
                 var values = {};
 
+                var event = document.createEvent('Event');
+                event.initEvent('requestsent', false, false);
+                formElement.dispatchEvent(event);
+
+                var responseReceived = function () {
+                    forms[id].status = 0;
+                    var event = document.createEvent('Event');
+                    event.initEvent('responsereceived', false, false);
+                    formElement.dispatchEvent(event);
+                };
+
+                var sendSubmitRequest = function () {
+                    var data = {};
+                    data['serverData'] = formData.serverData;
+                    data['values'] = JSON.stringify(values);
+
+                    ivoPetkov.bearFrameworkAddons.serverRequests.send('ivopetkov-form', data, function (responseText) {
+                        responseReceived();
+                        try {
+                            var response = JSON.parse(responseText);
+                        } catch (e) {
+                            var response = {};
+                        }
+                        if (typeof response.status !== 'undefined') {
+                            if (response.status === '0') {
+                                if (typeof response.error.element !== 'undefined' && response.error.element.length > 0) {
+                                    var invalidElement = formElement.querySelector('[name="' + response.error.element + '"]');
+                                    if (invalidElement !== null) {
+                                        invalidElement.focus();
+                                    }
+                                }
+                                if (typeof response.error.message !== 'undefined' && response.error.message.length > 0) {
+                                    if (typeof response.error.element !== 'undefined' && response.error.element.length > 0 && invalidElement !== null) {
+                                        createTooltip(id, invalidElement, response.error.message);
+                                    } else {
+                                        createTooltip(id, formElement, response.error.message);
+                                    }
+                                }
+                            } else if (response.status === '1') {
+                                var event = document.createEvent('Event');
+                                event.initEvent('submitdone', false, false);
+                                event.result = response.result;
+                                formElement.dispatchEvent(event);
+                            }
+                        }
+                    }, function () {
+                        responseReceived();
+                        createTooltip(id, formElement, 'Error occurred. Please, try again later.');
+                    });
+                };
+
+                var pendingUploads = {};
+                var hasPendingUploads = false;
+                var onFileUploaded = function (elementName, fileData) {
+                    pendingUploads[elementName] = 1;
+                    values[elementName] = {
+                        'type': 'file',
+                        'value': fileData
+                    };
+                    for (var k in pendingUploads) {
+                        if (pendingUploads[k] === null) {
+                            return;
+                        }
+                    }
+                    sendSubmitRequest();
+                };
+
                 var elements = formElement.querySelectorAll('input, select, textarea');
                 var elementsCount = elements.length;
                 for (var j = 0; j < elementsCount; j++) {
                     var element = elements[j];
                     if (element.name.length > 0) {
-                        values[element.name] = element.value;
-                    }
-                }
+                        var elementName = element.name;
+                        var elementType = element.getAttribute('type');
+                        if (elementType === 'file') {
+                            if (typeof element.files !== 'undefined' && element.files.length > 0) {
+                                (function (elementName) {
+                                    pendingUploads[elementName] = null;
+                                    var request = new XMLHttpRequest();
+                                    request.addEventListener("load", function () {
+                                        if (request.status === 200) {
+                                            if (request.responseText.indexOf('"filename":') > 0) {
+                                                onFileUploaded(elementName, request.responseText);
+                                                return;
+                                            }
+                                        }
+                                        responseReceived();
+                                    });
+                                    request.addEventListener("error", function () {
+                                        responseReceived();
+                                    });
+                                    request.addEventListener("abort", function () {
+                                        responseReceived();
+                                    });
+                                    request.addEventListener("timeout", function () {
+                                        responseReceived();
+                                    });
 
-                var data = {};
-                data['serverData'] = formData.serverData;
-                data['values'] = JSON.stringify(values);
-
-                var event = document.createEvent('Event');
-                event.initEvent('requestsent', false, false);
-                formElement.dispatchEvent(event);
-                
-                var responseReceived = function(){
-                    forms[id].status = 0;
-                    var event = document.createEvent('Event');
-                    event.initEvent('responsereceived', false, false);
-                    formElement.dispatchEvent(event);
-                }
-
-                ivoPetkov.bearFrameworkAddons.serverRequests.send('ivopetkov-form', data, function (responseText) {
-                    responseReceived();
-                    var response = JSON.parse(responseText);
-                    if (typeof response.status !== 'undefined') {
-                        if (response.status === '0') {
-                            if (typeof response.error.element !== 'undefined' && response.error.element.length > 0) {
-                                var invalidElement = formElement.querySelector('[name="' + response.error.element + '"]');
-                                if (invalidElement !== null) {
-                                    invalidElement.focus();
-                                }
+                                    var filesData = new FormData();
+                                    for (var i = 0; i < element.files.length; i++) {
+                                        filesData.append("file" + i, element.files[i]);
+                                    }
+                                    request.open('POST', formData.filesUploadUrl, true);
+                                    request.send(filesData);
+                                    hasPendingUploads = true;
+                                })(elementName);
+                            } else {
+                                values[elementName] = {
+                                    'type': elementType,
+                                    'value': ''
+                                };
                             }
-                            if (typeof response.error.message !== 'undefined' && response.error.message.length > 0) {
-                                if (typeof response.error.element !== 'undefined' && response.error.element.length > 0 && invalidElement !== null) {
-                                    createTooltip(id, invalidElement, response.error.message);
-                                } else {
-                                    createTooltip(id, formElement, response.error.message);
-                                }
-                            }
-                        } else if (response.status === '1') {
-                            var event = document.createEvent('Event');
-                            event.initEvent('submitdone', false, false);
-                            event.result = response.result;
-                            formElement.dispatchEvent(event);
+                        } else {
+                            values[elementName] = {
+                                'type': elementType,
+                                'value': element.value
+                            };
                         }
                     }
-                }, function () {
-                    responseReceived();
-                    createTooltip(id, formElement, 'Error occurred. Please, try again later.');
-                });
+                }
+                if (!hasPendingUploads) {
+                    sendSubmitRequest();
+                }
 
             }
         }
@@ -94,28 +164,26 @@ ivoPetkov.bearFrameworkAddons.form = (function () {
         return [rectangle.width, rectangle.height];
     };
 
-    var getElementCoordinates = function (element) {
-        var hasFixedParent = function (element) {
-            while (element.parentNode && typeof element.parentNode.tagName !== "undefined") {
-                var style = window.getComputedStyle(element, null);
-                if (style === null) {
-                    return false;
-                }
-                if (style.position === "fixed") {
-                    return true;
-                }
-                element = element.parentNode;
+    var hasFixedParent = function (element) {
+        while (element.parentNode && typeof element.parentNode.tagName !== "undefined") {
+            var style = window.getComputedStyle(element, null);
+            if (style === null) {
+                return false;
             }
-            return false;
-        };
+            if (style.position === "fixed") {
+                return true;
+            }
+            element = element.parentNode;
+        }
+        return false;
+    };
 
+    var getElementCoordinates = function (element) {
         var rectangle = element.getBoundingClientRect();
         var left = Math.round(rectangle.left);
         var top = Math.round(rectangle.top);
-        if (!hasFixedParent(element)) {
-            left += window.pageXOffset;
-            top += window.pageYOffset;
-        }
+        left += window.pageXOffset;
+        top += window.pageYOffset;
         return [left, top];
     };
 
@@ -128,6 +196,10 @@ ivoPetkov.bearFrameworkAddons.form = (function () {
                 element.innerText = text;
                 element.style.left = '-1000px';
                 element.style.top = '-1000px';
+                var targetHasFixedParent = hasFixedParent(target);
+                if (targetHasFixedParent) {
+                    element.style.position = 'fixed';
+                }
                 document.body.appendChild(element);
                 var updatePosition = function () {
                     var targetCoordinates = getElementCoordinates(target);
@@ -138,6 +210,10 @@ ivoPetkov.bearFrameworkAddons.form = (function () {
                         left = 5;
                     }
                     var top = targetCoordinates[1] - tooltipSize[1] - 2;
+                    if (targetHasFixedParent) {
+                        left -= window.pageXOffset;
+                        top -= window.pageYOffset;
+                    }
                     element.style.left = left + 'px';
                     element.style.top = 'calc(' + top + 'px - ' + formData.errorTooltipData['arrowSize'] + ')';
                 };
@@ -194,10 +270,6 @@ ivoPetkov.bearFrameworkAddons.form = (function () {
                     (f.bind(this))(event);
                 });
             }
-            formElement.addEventListener('submit', function (event) { // for input type=submit and enter in inputs
-                this.submit();
-                event.preventDefault();
-            });
         }
     };
 
