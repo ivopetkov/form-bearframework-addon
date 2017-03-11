@@ -36,7 +36,7 @@ if (!$app->data->exists('.temp/form/' . $serverDataKey)) {
     $app->data->set($app->data->make('.temp/form/' . $serverDataKey, $encodedServerData));
 }
 
-$style = 'background:rgba(0,0,0,.8);arrow-size:8px;';
+$style = 'background:rgba(255,0,0,.8);arrow-size:8px;';
 
 $getTooltipData = function($style) use (&$domDocument) {
     $arrowSize = null;
@@ -88,7 +88,7 @@ $initializeData = [
 ];
 
 $disableSubmitJs = 'var formElement = document.querySelector(\'form[data-form-id="' . $id . '"]\');if(formElement){formElement.submit=function(){};}';
-$html = '<script>' . $disableSubmitJs . 'var script=document.createElement(\'script\');script.src=\'' . $context->assets->getUrl('assets/form.js') . '\';script.onload=function(){ivoPetkov.bearFrameworkAddons.form.initialize(\'' . $id . '\',' . json_encode($initializeData) . ');};document.head.appendChild(script);</script>';
+$html = '<script>' . $disableSubmitJs . 'var script=document.createElement(\'script\');script.src=\'' . $context->assets->getUrl('assets/form.js', ['cacheMaxAge' => 999999, 'version' => 1]) . '\';script.onload=function(){ivoPetkov.bearFrameworkAddons.form.initialize(\'' . $id . '\',' . json_encode($initializeData) . ');};document.head.appendChild(script);</script>';
 
 $domDocument->insertHTML($html);
 echo $domDocument->saveHTML();

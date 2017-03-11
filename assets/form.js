@@ -105,6 +105,9 @@ ivoPetkov.bearFrameworkAddons.form = (function () {
                     if (element.name.length > 0) {
                         var elementName = element.name;
                         var elementType = element.getAttribute('type');
+                        if (elementType === null) {
+                            elementType = 'text';
+                        }
                         if (elementType === 'file') {
                             if (typeof element.files !== 'undefined' && element.files.length > 0) {
                                 (function (elementName) {
