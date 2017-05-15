@@ -14,6 +14,7 @@
     "require": {
         "php": ">=5.5.0",
         "bearframework/bearframework": "dev-master",
+        "bearframework/localization": "*",
         "ivopetkov/html-server-components-bearframework-addon": "0.2.*|0.3.*",
         "ivopetkov/server-requests-bearframework-addon": "*",
         "ivopetkov/html5-dom-document-php": "0.3.*|0.4.*"

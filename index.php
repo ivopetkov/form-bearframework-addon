@@ -21,6 +21,14 @@ $context->classes
 $context->assets
         ->addDir('assets');
 
+$app->localization
+        ->addDictionary('en', function() use ($context) {
+            return include $context->dir . '/locales/en.php';
+        })
+        ->addDictionary('bg', function() use ($context) {
+            return include $context->dir . '/locales/bg.php';
+        });
+
 $app->components
         ->addAlias('form', 'file:' . $context->dir . '/components/form.php');
 
@@ -60,7 +68,7 @@ $app->serverRequests
                 if (preg_match('/^[a-f0-9]{32}$/', $serverDataKey) !== 1) {
                     return;
                 }
-                $tempData = $app->data->getValue('.temp/form/' . $serverDataKey);
+                $tempData = \BearCMS\Internal\Data::getValue('.temp/form/' . $serverDataKey);
                 $serverData = $tempData !== null ? json_decode($tempData, true) : null;
                 if (!is_array($serverData)) {
                     return;

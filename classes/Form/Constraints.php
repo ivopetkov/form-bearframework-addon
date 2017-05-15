@@ -30,7 +30,7 @@ class Constraints
     public function setRequired(string $elementName, string $errorMessage = null): void
     {
         if ($errorMessage === null) {
-            $errorMessage = 'This field is required';
+            $errorMessage = __('ivopetkov.form.This field is required.');
         }
         $this->data[] = ['required', $errorMessage, $elementName];
     }
@@ -45,7 +45,7 @@ class Constraints
     public function setMinLength(string $elementName, int $minLength, string $errorMessage = null): void
     {
         if ($errorMessage === null) {
-            $errorMessage = 'The length of this field must be atleast ' . $minLength . ' characters';
+            $errorMessage = sprintf(__('ivopetkov.form.The length of this field must be atleast %s characters.'), $minLength);
         }
         $this->data[] = ['minLength', $errorMessage, $elementName, $minLength];
     }
@@ -60,7 +60,7 @@ class Constraints
     public function setMaxLength(string $elementName, int $maxLength, string $errorMessage = null): void
     {
         if ($errorMessage === null) {
-            $errorMessage = 'The length of this field must be atmost ' . $maxLength . ' characters';
+            $errorMessage = sprintf(__('ivopetkov.form.The length of this field must be atmost %s characters.'), $maxLength);
         }
         $this->data[] = ['maxLength', $errorMessage, $elementName, $maxLength];
     }
@@ -74,7 +74,7 @@ class Constraints
     public function setEmail(string $elementName, string $errorMessage = null): void
     {
         if ($errorMessage === null) {
-            $errorMessage = 'This is not a valid email address';
+            $errorMessage = __('ivopetkov.form.This is not a valid email address.');
         }
         $this->data[] = ['email', $errorMessage, $elementName];
     }
@@ -89,7 +89,7 @@ class Constraints
     public function setRegularExpression(string $elementName, string $regularExpression, string $errorMessage = null): void
     {
         if ($errorMessage === null) {
-            $errorMessage = 'This is not a valid value';
+            $errorMessage = __('ivopetkov.form.This is not a valid value.');
         }
         $this->data[] = ['regExp', $errorMessage, $elementName, $regularExpression];
     }

@@ -32,8 +32,10 @@ $serverData = [
 
 $encodedServerData = json_encode($serverData);
 $serverDataKey = md5($encodedServerData);
-if (!$app->data->exists('.temp/form/' . $serverDataKey)) {
-    $app->data->set($app->data->make('.temp/form/' . $serverDataKey, $encodedServerData));
+$dataKey = '.temp/form/' . $serverDataKey;
+if (!$app->data->exists($dataKey)) {
+    $app->data->set($app->data->make($dataKey, $encodedServerData));
+    \BearCMS\Internal\Data::setChanged($dataKey);
 }
 
 $style = 'background:rgba(255,0,0,.8);arrow-size:8px;';
@@ -67,7 +69,7 @@ $getTooltipData = function($style) use (&$domDocument) {
         $backgroundColor = 'rgba(0,0,0,.9)';
     }
 
-    $elementStyle = 'display:inline-block;background:' . $backgroundColor . ';border-radius:2px;font-family:Arial;font-size:14px;color:#fff;padding:13px 15px;position:absolute;z-index:10030000;max-width:220px;user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none;cursor:default;' . $style;
+    $elementStyle = 'display:inline-block;background:' . $backgroundColor . ';border-radius:2px;font-family:Arial;font-size:14px;color:#fff;padding:13px 15px;position:absolute;z-index:10030000;max-width:220px;user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none;cursor:default;text-align:center;' . $style;
     $elementBeforeStyle = 'border:solid;border-color:' . $backgroundColor . ' transparent;border-width:' . $arrowSize . ' ' . $arrowSize . ' 0 ' . $arrowSize . ';bottom:-' . $arrowSize . ';content:"";left:calc(50% - ' . $arrowSize . ');position:absolute;';
 
     $tooltipClassName = 'ipform' . md5($elementStyle . $elementBeforeStyle);
