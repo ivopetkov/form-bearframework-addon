@@ -27,6 +27,9 @@ $app->localization
         })
         ->addDictionary('bg', function() use ($context) {
             return include $context->dir . '/locales/bg.php';
+        })
+        ->addDictionary('ru', function() use ($context) {
+            return include $context->dir . '/locales/ru.php';
         });
 
 $app->components
