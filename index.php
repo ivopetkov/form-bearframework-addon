@@ -12,6 +12,7 @@ use IvoPetkov\BearFrameworkAddons\Form;
 
 $app = App::get();
 $context = $app->context->get(__FILE__);
+$useDataCache = isset($options['useDataCache']) && (int) $options['useDataCache'] > 0;
 
 $context->classes
         ->add(Form::class, 'classes/Form.php')
@@ -65,18 +66,25 @@ $app->routes
         }, ['POST']);
 
 $app->serverRequests
-        ->add('ivopetkov-form', function($data) use ($app) {
+        ->add('ivopetkov-form', function($data) use ($app, $useDataCache) {
             if (isset($data['serverData'], $data['values'])) {
                 $serverDataKey = $data['serverData'];
                 if (preg_match('/^[a-f0-9]{32}$/', $serverDataKey) !== 1) {
                     return;
                 }
-                $tempData = \BearCMS\Internal\Data::getValue('.temp/form/' . $serverDataKey);
-                $serverData = $tempData !== null ? json_decode($tempData, true) : null;
-                if (!is_array($serverData)) {
-                    return;
+
+                $serverData = null;
+                if ($useDataCache) {
+                    $dataCacheKey = 'ivopetkov-form-' . $serverDataKey;
+                    $serverData = $app->cache->getValue($dataCacheKey);
                 }
-                if (isset($serverData['componentHTML'])) {
+                if ($serverData === null) {
+                    $dataKey = '.temp/form/' . $serverDataKey;
+                    $serverData = $app->data->getValue($dataKey);
+                }
+
+                $serverData = $serverData !== null ? json_decode($serverData, true) : null;
+                if (is_array($serverData) && isset($serverData['componentHTML'])) {
                     $form = new Form();
                     $app->components->process($serverData['componentHTML'], ['variables' => ['form' => $form]]);
                     if (is_callable($form->onSubmit)) {

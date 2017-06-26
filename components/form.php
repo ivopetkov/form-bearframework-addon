@@ -11,6 +11,8 @@ use BearFramework\App;
 
 $app = App::get();
 $context = $app->context->get(__FILE__);
+$options = $app->addons->get('ivopetkov/form-bearframework-addon')->options;
+$useDataCache = isset($options['useDataCache']) && (int) $options['useDataCache'] > 0;
 
 $id = md5(uniqid() . 'form');
 $component->src = "file:" . $component->filename;
@@ -29,13 +31,22 @@ $formElement->setAttribute('onsubmit', "this.submit();event.preventDefault();ret
 $serverData = [
     'componentHTML' => $componentHTML
 ];
-
 $encodedServerData = json_encode($serverData);
 $serverDataKey = md5($encodedServerData);
-$dataKey = '.temp/form/' . $serverDataKey;
-if (!$app->data->exists($dataKey)) {
-    $app->data->set($app->data->make($dataKey, $encodedServerData));
-    \BearCMS\Internal\Data::setChanged($dataKey);
+
+$foundInCache = false;
+if ($useDataCache) {
+    $dataCacheKey = 'ivopetkov-form-' . $serverDataKey;
+    $foundInCache = $app->cache->exists($dataCacheKey);
+}
+if (!$foundInCache) {
+    $dataKey = '.temp/form/' . $serverDataKey;
+    if (!$app->data->exists($dataKey)) {
+        $app->data->set($app->data->make($dataKey, $encodedServerData));
+    }
+    if ($useDataCache) {
+        $app->cache->set($app->cache->make($dataCacheKey, $encodedServerData));
+    }
 }
 
 $style = 'background:rgba(255,0,0,.8);arrow-size:8px;';
