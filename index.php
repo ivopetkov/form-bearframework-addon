@@ -12,6 +12,7 @@ use IvoPetkov\BearFrameworkAddons\Form;
 
 $app = App::get();
 $context = $app->context->get(__FILE__);
+$options = $app->addons->get('ivopetkov/form-bearframework-addon')->options;
 $useDataCache = isset($options['useDataCache']) && (int) $options['useDataCache'] > 0;
 
 $context->classes
