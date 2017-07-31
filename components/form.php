@@ -101,7 +101,7 @@ $initializeData = [
 ];
 
 $disableSubmitJs = 'var formElement = document.querySelector(\'form[data-form-id="' . $id . '"]\');if(formElement){formElement.submit=function(){};}';
-$html = '<script>' . $disableSubmitJs . 'var script=document.createElement(\'script\');script.src=\'' . $context->assets->getUrl('assets/form.min.js', ['cacheMaxAge' => 999999, 'version' => 1]) . '\';script.onload=function(){ivoPetkov.bearFrameworkAddons.form.initialize(\'' . $id . '\',' . json_encode($initializeData) . ');};document.head.appendChild(script);</script>';
+$html = '<script>' . $disableSubmitJs . 'var script=document.createElement(\'script\');script.src=\'' . $context->assets->getUrl('assets/form.min.js', ['cacheMaxAge' => 999999999, 'version' => 1]) . '\';script.onload=function(){ivoPetkov.bearFrameworkAddons.form.initialize(\'' . $id . '\',' . json_encode($initializeData) . ');};document.head.appendChild(script);</script>';
 
 $domDocument->insertHTML($html);
 echo $domDocument->saveHTML();
