@@ -13,7 +13,6 @@ use IvoPetkov\BearFrameworkAddons\Form;
 $app = App::get();
 $context = $app->context->get(__FILE__);
 $options = $app->addons->get('ivopetkov/form-bearframework-addon')->options;
-$useDataCache = isset($options['useDataCache']) && (int) $options['useDataCache'] > 0;
 
 $context->classes
         ->add(Form::class, 'classes/Form.php')
@@ -67,27 +66,23 @@ $app->routes
         }, ['POST']);
 
 $app->serverRequests
-        ->add('ivopetkov-form', function($data) use ($app, $useDataCache) {
+        ->add('ivopetkov-form', function($data) use ($app) {
             if (isset($data['serverData'], $data['values'])) {
-                $serverDataKey = $data['serverData'];
-                if (preg_match('/^[a-f0-9]{32}$/', $serverDataKey) !== 1) {
+                $serverData = $data['serverData'];
+                $encryptedServerDataHash = substr($serverData, 0, 32);
+                try {
+                    $encryptedServerData = gzuncompress($app->encryption->decrypt(base64_decode(substr($serverData, 32))));
+                } catch (\Exception $e) {
                     return;
                 }
-
-                $serverData = null;
-                if ($useDataCache) {
-                    $dataCacheKey = 'ivopetkov-form-' . $serverDataKey;
-                    $serverData = $app->cache->getValue($dataCacheKey);
+                if (md5($encryptedServerData) !== $encryptedServerDataHash) {
+                    return;
                 }
-                if ($serverData === null) {
-                    $dataKey = '.temp/form/' . $serverDataKey;
-                    $serverData = $app->data->getValue($dataKey);
-                }
-
-                $serverData = $serverData !== null ? json_decode($serverData, true) : null;
-                if (is_array($serverData) && isset($serverData['componentHTML'])) {
+                $encryptedServerData = json_decode($encryptedServerData);
+                if (is_array($encryptedServerData) && isset($encryptedServerData[0], $encryptedServerData[1]) && $encryptedServerData[0] === 'form') {
+                    $componentHTML = $encryptedServerData[1];
                     $form = new Form();
-                    $app->components->process($serverData['componentHTML'], ['variables' => ['form' => $form]]);
+                    $app->components->process($componentHTML, ['variables' => ['form' => $form]]);
                     if (is_callable($form->onSubmit)) {
                         $tempValues = json_decode($data['values'], true);
                         $values = [];

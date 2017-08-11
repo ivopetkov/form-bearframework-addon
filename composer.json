@@ -17,6 +17,7 @@
         "bearframework/localization-addon": "v0.2.*@beta",
         "ivopetkov/html-server-components-bearframework-addon": "0.2.*|0.3.*|0.4.*|0.5.*@beta",
         "ivopetkov/server-requests-bearframework-addon": "0.3.*@beta",
+        "ivopetkov/encryption-bearframework-addon": "0.1.*",
         "ivopetkov/html5-dom-document-php": "0.3.*|0.4.*|0.5.*"
     },
     "require-dev": {

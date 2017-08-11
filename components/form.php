@@ -28,26 +28,9 @@ if ($formElement) {
     $formElement->setAttribute('data-form-id', $id);
 }
 $formElement->setAttribute('onsubmit', "this.submit();event.preventDefault();return false;");
-$serverData = [
-    'componentHTML' => $componentHTML
-];
-$encodedServerData = json_encode($serverData);
-$serverDataKey = md5($encodedServerData);
 
-$foundInCache = false;
-if ($useDataCache) {
-    $dataCacheKey = 'ivopetkov-form-' . $serverDataKey;
-    $foundInCache = $app->cache->exists($dataCacheKey);
-}
-if (!$foundInCache) {
-    $dataKey = '.temp/form/' . $serverDataKey;
-    if (!$app->data->exists($dataKey)) {
-        $app->data->set($app->data->make($dataKey, $encodedServerData));
-    }
-    if ($useDataCache) {
-        $app->cache->set($app->cache->make($dataCacheKey, $encodedServerData));
-    }
-}
+$serverData = json_encode(['form', $componentHTML]);
+$encryptedServerData = md5($serverData) . base64_encode($app->encryption->encrypt(gzcompress($serverData)));
 
 $style = 'background:rgba(255,0,0,.8);arrow-size:8px;';
 
@@ -95,7 +78,7 @@ $getTooltipData = function($style) use (&$domDocument) {
 };
 
 $initializeData = [
-    'serverData' => $serverDataKey,
+    'serverData' => $encryptedServerData,
     'errorTooltipData' => $getTooltipData(''),
     'filesUploadUrl' => $app->urls->get('/ivopetkov-form-files-upload/')
 ];
