@@ -78,7 +78,7 @@ $app->serverRequests
                 if (md5($encryptedServerData) !== $encryptedServerDataHash) {
                     return;
                 }
-                $encryptedServerData = json_decode($encryptedServerData);
+                $encryptedServerData = json_decode($encryptedServerData, true);
                 if (is_array($encryptedServerData) && isset($encryptedServerData[0], $encryptedServerData[1]) && $encryptedServerData[0] === 'form') {
                     $componentHTML = $encryptedServerData[1];
                     $form = new Form();
