@@ -12,7 +12,6 @@ use BearFramework\App;
 $app = App::get();
 $context = $app->context->get(__FILE__);
 $options = $app->addons->get('ivopetkov/form-bearframework-addon')->options;
-$useDataCache = isset($options['useDataCache']) && (int) $options['useDataCache'] > 0;
 
 $id = md5(uniqid() . 'form');
 $component->src = "file:" . $component->filename;
