@@ -26,13 +26,15 @@ class Constraints
      * 
      * @param string $elementName The element name
      * @param string $errorMessage Error message
+     * @return \IvoPetkov\BearFrameworkAddons\Form\Constraints Returns a reference to itself.
      */
-    public function setRequired(string $elementName, string $errorMessage = null): void
+    public function setRequired(string $elementName, string $errorMessage = null): \IvoPetkov\BearFrameworkAddons\Form\Constraints
     {
         if ($errorMessage === null) {
             $errorMessage = __('ivopetkov.form.This field is required.');
         }
         $this->data[] = ['required', $errorMessage, $elementName];
+        return $this;
     }
 
     /**
@@ -41,13 +43,15 @@ class Constraints
      * @param string $elementName The element name
      * @param int $minLength
      * @param string $errorMessage Error message
+     * @return \IvoPetkov\BearFrameworkAddons\Form\Constraints Returns a reference to itself.
      */
-    public function setMinLength(string $elementName, int $minLength, string $errorMessage = null): void
+    public function setMinLength(string $elementName, int $minLength, string $errorMessage = null): \IvoPetkov\BearFrameworkAddons\Form\Constraints
     {
         if ($errorMessage === null) {
             $errorMessage = sprintf(__('ivopetkov.form.The length of this field must be atleast %s characters.'), $minLength);
         }
         $this->data[] = ['minLength', $errorMessage, $elementName, $minLength];
+        return $this;
     }
 
     /**
@@ -56,13 +60,15 @@ class Constraints
      * @param string $elementName The element name
      * @param int $maxLength
      * @param string $errorMessage Error message
+     * @return \IvoPetkov\BearFrameworkAddons\Form\Constraints Returns a reference to itself.
      */
-    public function setMaxLength(string $elementName, int $maxLength, string $errorMessage = null): void
+    public function setMaxLength(string $elementName, int $maxLength, string $errorMessage = null): \IvoPetkov\BearFrameworkAddons\Form\Constraints
     {
         if ($errorMessage === null) {
             $errorMessage = sprintf(__('ivopetkov.form.The length of this field must be atmost %s characters.'), $maxLength);
         }
         $this->data[] = ['maxLength', $errorMessage, $elementName, $maxLength];
+        return $this;
     }
 
     /**
@@ -70,13 +76,15 @@ class Constraints
      * 
      * @param string $elementName The element name
      * @param string $errorMessage Error message
+     * @return \IvoPetkov\BearFrameworkAddons\Form\Constraints Returns a reference to itself.
      */
-    public function setEmail(string $elementName, string $errorMessage = null): void
+    public function setEmail(string $elementName, string $errorMessage = null): \IvoPetkov\BearFrameworkAddons\Form\Constraints
     {
         if ($errorMessage === null) {
             $errorMessage = __('ivopetkov.form.This is not a valid email address.');
         }
         $this->data[] = ['email', $errorMessage, $elementName];
+        return $this;
     }
 
     /**
@@ -85,13 +93,15 @@ class Constraints
      * @param string $elementName The element name
      * @param string $regularExpression
      * @param string $errorMessage Error message
+     * @return \IvoPetkov\BearFrameworkAddons\Form\Constraints Returns a reference to itself.
      */
-    public function setRegularExpression(string $elementName, string $regularExpression, string $errorMessage = null): void
+    public function setRegularExpression(string $elementName, string $regularExpression, string $errorMessage = null): \IvoPetkov\BearFrameworkAddons\Form\Constraints
     {
         if ($errorMessage === null) {
             $errorMessage = __('ivopetkov.form.This is not a valid value.');
         }
         $this->data[] = ['regExp', $errorMessage, $elementName, $regularExpression];
+        return $this;
     }
 
     /**
