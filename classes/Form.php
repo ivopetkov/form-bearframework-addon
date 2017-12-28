@@ -23,7 +23,7 @@ class Form
 
     /**
      *
-     * @var \IvoPetkov\Form\BearFrameworkAddons\Constraints
+     * @var \IvoPetkov\BearFrameworkAddons\Form\Constraints
      */
     public $constraints;
 
