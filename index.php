@@ -140,7 +140,7 @@ $app->serverRequests
                             return json_encode([
                                 'status' => '0',
                                 'error' => [
-                                    'message' => 'Error occurred. Please, try again later.'
+                                    'message' => __('ivopetkov.form.Error occurred. Please, try again later.')
                                 ]
                             ]);
                         }

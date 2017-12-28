@@ -6,4 +6,5 @@ return [
     'ivopetkov.form.The length of this field must be atmost %s characters.' => 'The length of this field must be atmost %s characters.',
     'ivopetkov.form.This is not a valid email address.' => 'This is not a valid email address.',
     'ivopetkov.form.This is not a valid value.' => 'This is not a valid value.',
+    'ivopetkov.form.Error occurred. Please, try again later.' => 'Error occurred. Please, try again later.',
 ];
