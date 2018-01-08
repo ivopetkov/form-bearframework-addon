@@ -39,7 +39,7 @@ $app->components
 $app->routes
         ->add('/ivopetkov-form-files-upload/', function() use ($app) {
             $response = [];
-            for ($i = 0; $i < 100; $i++) {
+            for ($i = 0; $i < 100000; $i++) {
                 $fileItem = $app->request->formData->getFile('file' . $i);
                 if ($fileItem === null) {
                     break;
