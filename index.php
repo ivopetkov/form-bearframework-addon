@@ -66,7 +66,7 @@ $app->routes
         }, ['POST']);
 
 $app->serverRequests
-        ->add('ivopetkov-form', function($data) use ($app) {
+        ->add('ivopetkov-form', function($data, \BearFramework\App\Response $response) use ($app) {
             if (isset($data['serverData'], $data['values'])) {
                 $serverData = $data['serverData'];
                 $encryptedServerDataHash = substr($serverData, 0, 32);
@@ -125,7 +125,7 @@ $app->serverRequests
                         }
 
                         try {
-                            $closure = \Closure::bind($form->onSubmit, $form);
+                            $closure = \Closure::bind($form->onSubmit, $form, $response);
                             $returnValue = call_user_func($closure, new ArrayObject($values));
                         } catch (Form\Internal\ErrorException $e) {
                             return json_encode([
