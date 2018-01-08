@@ -125,8 +125,8 @@ $app->serverRequests
                         }
 
                         try {
-                            $closure = \Closure::bind($form->onSubmit, $form, $response);
-                            $returnValue = call_user_func($closure, new ArrayObject($values));
+                            $closure = \Closure::bind($form->onSubmit, $form);
+                            $returnValue = call_user_func($closure, new ArrayObject($values), $response);
                         } catch (Form\Internal\ErrorException $e) {
                             return json_encode([
                                 'status' => '0',
