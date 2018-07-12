@@ -10,7 +10,7 @@
 /**
  * @runTestsInSeparateProcesses
  */
-class FormTest extends BearFrameworkAddonTestCase
+class FormTest extends BearFramework\AddonTests\PHPUnitTestCase
 {
 
     /**

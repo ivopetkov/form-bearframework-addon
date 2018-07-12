@@ -9,10 +9,3 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-/**
- * 
- */
-class BearFrameworkAddonTestCase extends PHPUnit_Framework_TestCase
-{
-
-}
