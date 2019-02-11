@@ -8,10 +8,11 @@
  */
 
 use BearFramework\App;
+use IvoPetkov\HTML5DOMDocument;
 
 $app = App::get();
-$context = $app->context->get(__FILE__);
-$options = $app->addons->get('ivopetkov/form-bearframework-addon')->options;
+$context = $app->contexts->get(__FILE__);
+//$options = $app->addons->get('ivopetkov/form-bearframework-addon')->options;
 
 $id = md5(uniqid() . 'form');
 $component->src = "file:" . $component->filename;
@@ -19,8 +20,8 @@ unset($component->filename);
 $componentHTML = (string) $component;
 $form = new IvoPetkov\BearFrameworkAddons\Form();
 $output = $app->components->process($componentHTML, ['variables' => ['form' => $form]]);
-$domDocument = new IvoPetkov\HTML5DOMDocument();
-$domDocument->loadHTML($output);
+$domDocument = new HTML5DOMDocument();
+$domDocument->loadHTML($output, HTML5DOMDocument::ALLOW_DUPLICATE_IDS);
 
 $formElement = $domDocument->querySelector('form');
 if ($formElement) {
@@ -83,7 +84,7 @@ $initializeData = [
 ];
 
 $disableSubmitJs = 'var formElement = document.querySelector(\'form[data-form-id="' . $id . '"]\');if(formElement){formElement.submit=function(){};}';
-$html = '<script>' . $disableSubmitJs . 'var script=document.createElement(\'script\');script.src=\'' . $context->assets->getUrl('assets/form.min.js', ['cacheMaxAge' => 999999999, 'version' => 1]) . '\';script.onload=function(){ivoPetkov.bearFrameworkAddons.form.initialize(\'' . $id . '\',' . json_encode($initializeData) . ');};document.head.appendChild(script);</script>';
+$html = '<script>' . $disableSubmitJs . 'var script=document.createElement(\'script\');script.src=\'' . $context->assets->getURL('assets/form.min.js', ['cacheMaxAge' => 999999999, 'version' => 1]) . '\';script.onload=function(){ivoPetkov.bearFrameworkAddons.form.initialize(\'' . $id . '\',' . json_encode($initializeData) . ');};document.head.appendChild(script);</script>';
 
 $domDocument->insertHTML($html);
 echo $domDocument->saveHTML();

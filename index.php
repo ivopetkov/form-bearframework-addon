@@ -11,13 +11,11 @@ use BearFramework\App;
 use IvoPetkov\BearFrameworkAddons\Form;
 
 $app = App::get();
-$context = $app->context->get(__FILE__);
-$options = $app->addons->get('ivopetkov/form-bearframework-addon')->options;
+$context = $app->contexts->get(__FILE__);
 
 $context->classes
-        ->add(Form::class, 'classes/Form.php')
-        ->add(Form\Constraints::class, 'classes/Form/Constraints.php')
-        ->add(Form\Internal\ErrorException::class, 'classes/Form/Internal/ErrorException.php');
+        ->add('IvoPetkov\BearFrameworkAddons\Form', 'classes/Form.php')
+        ->add('IvoPetkov\BearFrameworkAddons\Form\*', 'classes/Form/*.php');
 
 $context->assets
         ->addDir('assets');
@@ -37,7 +35,7 @@ $app->components
         ->addAlias('form', 'file:' . $context->dir . '/components/form.php');
 
 $app->routes
-        ->add('/ivopetkov-form-files-upload/', function() use ($app) {
+        ->add('POST /ivopetkov-form-files-upload/', function() use ($app) {
             $response = [];
             for ($i = 0; $i < 100000; $i++) {
                 $fileItem = $app->request->formData->getFile('file' . $i);
@@ -63,7 +61,7 @@ $app->routes
                 }
             }
             return new App\Response\JSON(json_encode($response));
-        }, ['POST']);
+        });
 
 $app->serverRequests
         ->add('ivopetkov-form', function($data, \BearFramework\App\Response $response) use ($app) {
