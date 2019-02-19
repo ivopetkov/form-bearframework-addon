@@ -51,7 +51,8 @@ $app->routes
                             mkdir($pathInfo['dirname'], 0777, true);
                         }
                     }
-                    rename($fileItem->filename, $newFilepath);
+                    copy($fileItem->filename, $newFilepath); // rename() - Cannot rename a file across wrapper types
+                    unlink($fileItem->filename);
                     $response[] = [
                         'value' => $fileItem->value,
                         'filename' => $filename,
