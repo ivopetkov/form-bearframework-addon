@@ -78,7 +78,7 @@ ivoPetkov.bearFrameworkAddons.form = (function () {
                         }
                     }, function () {
                         responseReceived();
-                        createTooltip(id, formElement, 'Error occurred. Please, try again later.');
+                        createTooltip(id, formElement, formData.errorMessage);
                     });
                 };
 

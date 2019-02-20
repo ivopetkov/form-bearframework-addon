@@ -80,11 +80,12 @@ $getTooltipData = function($style) use (&$domDocument) {
 $initializeData = [
     'serverData' => $encryptedServerData,
     'errorTooltipData' => $getTooltipData(''),
-    'filesUploadUrl' => $app->urls->get('/ivopetkov-form-files-upload/')
+    'filesUploadUrl' => $app->urls->get('/ivopetkov-form-files-upload/'),
+    'errorMessage' => __('ivopetkov.form.Error occurred. Please, try again later.')
 ];
 
 $disableSubmitJs = 'var formElement = document.querySelector(\'form[data-form-id="' . $id . '"]\');if(formElement){formElement.submit=function(){};}';
-$html = '<script>' . $disableSubmitJs . 'var script=document.createElement(\'script\');script.src=\'' . $context->assets->getURL('assets/form.min.js', ['cacheMaxAge' => 999999999, 'version' => 1]) . '\';script.onload=function(){ivoPetkov.bearFrameworkAddons.form.initialize(\'' . $id . '\',' . json_encode($initializeData) . ');};document.head.appendChild(script);</script>';
+$html = '<script>' . $disableSubmitJs . 'var script=document.createElement(\'script\');script.src=\'' . $context->assets->getURL('assets/form.min.js', ['cacheMaxAge' => 999999999, 'version' => 2]) . '\';script.onload=function(){ivoPetkov.bearFrameworkAddons.form.initialize(\'' . $id . '\',' . json_encode($initializeData) . ');};document.head.appendChild(script);</script>';
 
 $domDocument->insertHTML($html);
 echo $domDocument->saveHTML();
