@@ -12,6 +12,7 @@ BearFramework\Addons::register('ivopetkov/form-bearframework-addon', __DIR__, [
         'bearframework/localization-addon',
         'ivopetkov/html-server-components-bearframework-addon',
         'ivopetkov/server-requests-bearframework-addon',
-        'ivopetkov/encryption-bearframework-addon'
+        'ivopetkov/encryption-bearframework-addon',
+        'ivopetkov/client-shortcuts-bearframework-addon',
     ]
 ]);
