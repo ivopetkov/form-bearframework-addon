@@ -146,10 +146,17 @@ $app->serverRequests
 
 $app->clientShortcuts
         ->add('form', function(IvoPetkov\BearFrameworkAddons\ClientShortcut $shortcut) {
-            $shortcut->requirements[] = [// taken from dev/form.js // file_get_contents(__DIR__ . '/../dev/form.js')
+            $shortcut->requirements[] = [// taken from dev/form.js // file_get_contents(__DIR__ . '/dev/form.js')
                 'type' => 'text',
-                'value' => 'var ivoPetkov=ivoPetkov||{};ivoPetkov.bearFrameworkAddons=ivoPetkov.bearFrameworkAddons||{};ivoPetkov.bearFrameworkAddons.form=ivoPetkov.bearFrameworkAddons.form||function(){var d=[],e=function(a){if("undefined"!==typeof d[a]){var c=document.querySelector(\'form[data-form-id="\'+a+\'"]\');if(null!==c&&1!==d[a].status){var b=document.createEvent("Event");b.initEvent("beforesubmit",!1,!0);c.dispatchEvent(b)&&(d[a].status=1,b=document.createEvent("Event"),b.initEvent("submitstart",!1,!1),c.dispatchEvent(b),clientShortcuts.get("-form-submit").then(function(b){b.submit(c,d[a])}))}}};return{initialize:function(a){var c=a[0];d[c]={serverData:a[1],errorMessage:a[2],status:0};var b=document.querySelector(\'form[data-form-id="\'+c+\'"]\');null!==b&&(b.submit=function(){e(c)},a=function(a){var c=b.getAttribute("on"+a);null!==c&&b.addEventListener(a,function(a){(new Function("return function(event){"+c+"}"))().bind(this)(a)})},a("beforesubmit"),a("submitstart"),a("submitend"),a("submitsuccess"),a("submiterror"))},submit:e}}();',
+                'value' => 'var ivoPetkov=ivoPetkov||{};ivoPetkov.bearFrameworkAddons=ivoPetkov.bearFrameworkAddons||{};ivoPetkov.bearFrameworkAddons.form=ivoPetkov.bearFrameworkAddons.form||function(){var d=[],f=function(a){return"undefined"!==typeof d[a]?document.querySelector(\'form[data-form-id="\'+a+\'"]\'):null},k=function(a){var c=f(a);if(null!==c&&1!==d[a].status){var b=document.createEvent("Event");b.initEvent("beforesubmit",!1,!0);c.dispatchEvent(b)&&(d[a].status=1,h(a,!0),b=document.createEvent("Event"),b.initEvent("submitstart",!1,!1),c.dispatchEvent(b),clientShortcuts.get("-form-submit").then(function(b){b.submit(c,d[a])}))}},h=function(a,c){var b=f(a);if(null!==b){c?b.setAttribute("disabled","true"):b.removeAttribute("disabled");b=b.querySelectorAll("input, select, textarea");for(var d=b.length,g=0;g<d;g++){var e=b[g];c?(e.setAttribute("disabled","true"),e.ipfrmds=1):"undefined"!==typeof e.ipfrmds&&(e.removeAttribute("disabled"),delete e.ipfrmds)}}};return{initialize:function(a){var c=a[0];d[c]={serverData:a[1],errorMessage:a[2],status:0};var b=f(c);null!==b&&(b.submit=function(){k(c)},a=function(a){var c=b.getAttribute("on"+a);null!==c&&b.addEventListener(a,function(a){(new Function("return function(event){"+c+"}"))().bind(this)(a)})},a("beforesubmit"),a("submitstart"),a("submitend"),a("submitsuccess"),a("submiterror"),b.addEventListener("submitend",function(){h(c,!1)}))},submit:k}}();',
                 'mimeType' => 'text/javascript'
+            ];
+            $shortcut->requirements[] = [
+                'type' => 'text',
+                'value' => 'form[data-form-id][disabled]{position:relative;}'
+                . 'form[data-form-id][disabled],form[data-form-id][disabled] input, form[data-form-id][disabled] select,form[data-form-id][disabled] textarea{user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none;pointer-events:none;}'
+                . 'form[data-form-id][disabled]:before{content:"";display:block;position:absolute;width:100%;height:100%;}',
+                'mimeType' => 'text/css'
             ];
             $shortcut->get = 'return ivoPetkov.bearFrameworkAddons.form;';
         })
