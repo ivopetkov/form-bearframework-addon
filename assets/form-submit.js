@@ -18,28 +18,21 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
         };
     };
 
-    var submit = function (formElement, formData) {
+    var submit = function (formElement, formData, dispatchEvent, onEnd) {
         var values = {};
 
         var dispatchEnd = function () {
-            var event = document.createEvent('Event');
-            event.initEvent('submitend', false, false);
-            formElement.dispatchEvent(event);
-            formData.status = 0;
+            dispatchEvent('submitend');
+            onEnd();
         };
 
         var dispatchSuccess = function (result) {
-            var event = document.createEvent('Event');
-            event.initEvent('submitsuccess', false, false);
-            event.result = result;
-            formElement.dispatchEvent(event);
+            dispatchEvent('submitsuccess', {'result': result});
             dispatchEnd();
         };
 
         var dispatchError = function () {
-            var event = document.createEvent('Event');
-            event.initEvent('submiterror', false, false);
-            formElement.dispatchEvent(event);
+            dispatchEvent('submiterror');
             dispatchEnd();
         };
 

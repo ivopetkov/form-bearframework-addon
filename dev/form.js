@@ -5,6 +5,8 @@
  * Free to use under the MIT license.
  */
 
+/* global clientShortcuts */
+
 var ivoPetkov = ivoPetkov || {};
 ivoPetkov.bearFrameworkAddons = ivoPetkov.bearFrameworkAddons || {};
 ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (function () {
@@ -16,6 +18,17 @@ ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (func
             return document.querySelector('form[data-form-id="' + id + '"]');
         }
         return null;
+    };
+
+
+    var makeEvent = function (name) {
+        if (typeof Event === 'function') {
+            return new Event(name);
+        } else {
+            var event = document.createEvent('Event');
+            event.initEvent(name, false, false);
+            return event;
+        }
     };
 
     var initialize = function (data) {
@@ -44,33 +57,50 @@ ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (func
             processEventAttributes('submitend');
             processEventAttributes('submitsuccess');
             processEventAttributes('submiterror');
-            formElement.addEventListener('submitend', function () {
-                disableOrEnable(id, false);
-            });
         }
     };
 
     var submit = function (id) {
         var formElement = getFormElement(id);
         if (formElement !== null) {
-            if (forms[id].status === 1) {
+            var formData = forms[id];
+            if (formData.status === 1) {
                 return;
             }
-            var event = document.createEvent('Event');
-            event.initEvent('beforesubmit', false, true);
-            var cancelled = !formElement.dispatchEvent(event);
+
+            var dispatchEvent = function (name, data) {
+                var event = makeEvent(name);
+                if (typeof data !== 'undefined') {
+                    for (var key in data) {
+                        event[key] = data[key];
+                    }
+                }
+                var updateDisabled = false;
+                if (formElement.getAttribute('disabled') === 'true') {
+                    formElement.removeAttribute('disabled'); // The events does not work in IE 11 if disabled
+                    updateDisabled = true;
+                }
+                var result = formElement.dispatchEvent(event);
+                if (updateDisabled) {
+                    formElement.setAttribute('disabled', 'true');
+                }
+                return result;
+            };
+
+            var cancelled = !dispatchEvent('beforesubmit');
             if (cancelled) {
                 return;
             }
-            forms[id].status = 1;
+            formData.status = 1;
 
             disableOrEnable(id, true);
-            var event = document.createEvent('Event');
-            event.initEvent('submitstart', false, false);
-            formElement.dispatchEvent(event);
+            dispatchEvent('submitstart');
 
             clientShortcuts.get('-form-submit').then(function (formSubmit) {
-                formSubmit.submit(formElement, forms[id]);
+                formSubmit.submit(formElement, formData, dispatchEvent, function () {
+                    formData.status = 0;
+                    disableOrEnable(id, false);
+                });
             });
         }
     };
