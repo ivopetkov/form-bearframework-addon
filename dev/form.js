@@ -5,7 +5,7 @@
  * Free to use under the MIT license.
  */
 
-/* global clientShortcuts */
+/* global clientPackages */
 
 var ivoPetkov = ivoPetkov || {};
 ivoPetkov.bearFrameworkAddons = ivoPetkov.bearFrameworkAddons || {};
@@ -96,7 +96,7 @@ ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (func
             disableOrEnable(id, true);
             dispatchEvent('submitstart');
 
-            clientShortcuts.get('-form-submit').then(function (formSubmit) {
+            clientPackages.get('-form-submit').then(function (formSubmit) {
                 formSubmit.submit(formElement, formData, dispatchEvent, function () {
                     formData.status = 0;
                     disableOrEnable(id, false);

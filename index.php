@@ -144,30 +144,27 @@ $app->serverRequests
             }
         });
 
-$app->clientShortcuts
-        ->add('form', function(IvoPetkov\BearFrameworkAddons\ClientShortcut $shortcut) {
-            $shortcut->requirements[] = [// taken from dev/form.js // file_get_contents(__DIR__ . '/dev/form.js')
-                'type' => 'text',
-                'value' => 'var ivoPetkov=ivoPetkov||{};ivoPetkov.bearFrameworkAddons=ivoPetkov.bearFrameworkAddons||{};ivoPetkov.bearFrameworkAddons.form=ivoPetkov.bearFrameworkAddons.form||function(){var g=[],h=function(a){return"undefined"!==typeof g[a]?document.querySelector(\'form[data-form-id="\'+a+\'"]\'):null},l=function(a){var d=h(a);if(null!==d){var b=g[a];if(1!==b.status){var e=function(a,b){if("function"===typeof Event)var c=new Event(a);else c=document.createEvent("Event"),c.initEvent(a,!1,!1);if("undefined"!==typeof b)for(var e in b)c[e]=b[e];e=!1;"true"===d.getAttribute("disabled")&&(d.removeAttribute("disabled"),e=!0);c=d.dispatchEvent(c);e&&d.setAttribute("disabled","true");return c};e("beforesubmit")&&(b.status=1,k(a,!0),e("submitstart"),clientShortcuts.get("-form-submit").then(function(c){c.submit(d,b,e,function(){b.status=0;k(a,!1)})}))}}},k=function(a,d){var b=h(a);if(null!==b){d?b.setAttribute("disabled","true"):b.removeAttribute("disabled");b=b.querySelectorAll("input, select, textarea");for(var e=b.length,c=0;c<e;c++){var f=b[c];d?(f.setAttribute("disabled","true"),f.ipfrmds=1):"undefined"!==typeof f.ipfrmds&&(f.removeAttribute("disabled"),delete f.ipfrmds)}}};return{initialize:function(a){var d=a[0];g[d]={serverData:a[1],errorMessage:a[2],status:0};var b=h(d);null!==b&&(b.submit=function(){l(d)},a=function(a){var c=b.getAttribute("on"+a);null!==c&&b.addEventListener(a,function(a){(new Function("return function(event){"+c+"}"))().bind(this)(a)})},a("beforesubmit"),a("submitstart"),a("submitend"),a("submitsuccess"),a("submiterror"))},submit:l}}();',
-                'mimeType' => 'text/javascript'
-            ];
-            $shortcut->requirements[] = [
-                'type' => 'text',
-                'value' => 'form[data-form-id][disabled]{position:relative;}'
-                . 'form[data-form-id][disabled],form[data-form-id][disabled] input, form[data-form-id][disabled] select,form[data-form-id][disabled] textarea{user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none;pointer-events:none;}'
-                . 'form[data-form-id][disabled]:before{content:"";display:block;position:absolute;width:100%;height:100%;}',
-                'mimeType' => 'text/css'
-            ];
-            $shortcut->get = 'return ivoPetkov.bearFrameworkAddons.form;';
-        })
-        ->add('-form-submit', function(IvoPetkov\BearFrameworkAddons\ClientShortcut $shortcut) use ($app, $context) {
-            $shortcut->requirements[] = [
-                'type' => 'file',
-                'url' => $context->assets->getURL('assets/form-submit.min.js', ['cacheMaxAge' => 999999999, 'version' => 2, 'robotsNoIndex' => true]),
-                'mimeType' => 'text/javascript'
-            ];
+$app->clientPackages
+        ->add('form', 1, function(IvoPetkov\BearFrameworkAddons\ClientPackage $package) use ($context) {
+            $code = include $context->dir.'/assets/form.min.js.php';
+            //$code = file_get_contents($context->dir . '/dev/form.js');
+            $package->addJSCode($code);
 
-            $getTooltipData = function($style = '') use ($shortcut) { //$style = 'background:rgba(255,0,0,.8);arrow-size:8px;';
+            $code = 'form[data-form-id][disabled]{position:relative;}'
+                    . 'form[data-form-id][disabled],form[data-form-id][disabled] input, form[data-form-id][disabled] select,form[data-form-id][disabled] textarea{user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none;pointer-events:none;}'
+                    . 'form[data-form-id][disabled]:before{content:"";display:block;position:absolute;width:100%;height:100%;}';
+            $package->addCSSCode($code);
+
+            $package->preparePackage('-form-submit');
+
+            $package->get = 'return ivoPetkov.bearFrameworkAddons.form;';
+        })
+        ->add('-form-submit', md5('1' . $app->request->base), function(IvoPetkov\BearFrameworkAddons\ClientPackage $package) use ($app, $context) {
+            $package->addJSFile($context->assets->getURL('assets/form-submit.min.js', ['cacheMaxAge' => 999999999, 'version' => 2, 'robotsNoIndex' => true]));
+
+            $package->preparePackage('serverRequests');
+            
+            $getTooltipData = function($style = '') use ($package) { //$style = 'background:rgba(255,0,0,.8);arrow-size:8px;';
                 $arrowSize = null;
                 $backgroundColor = null;
                 $styleParts = explode(';', $style);
@@ -203,11 +200,7 @@ $app->clientShortcuts
                 $style = '.' . $tooltipClassName . '{' . $elementStyle . '}'
                         . '.' . $tooltipClassName . ':before{' . $elementBeforeStyle . '}';
 
-                $shortcut->requirements[] = [
-                    'type' => 'text',
-                    'value' => $style,
-                    'mimeType' => 'text/css'
-                ];
+                $package->addCSSCode($style);
 
                 return [
                     'className' => $tooltipClassName,
@@ -220,7 +213,7 @@ $app->clientShortcuts
                 $app->urls->get('/-ivopetkov-form-files-upload/')
             ];
 
-            $shortcut->init = 'ivoPetkov.bearFrameworkAddons.formSubmit.initialize(' . json_encode($initializeData) . ');';
-            $shortcut->get = 'return ivoPetkov.bearFrameworkAddons.formSubmit;';
+            $package->init = 'ivoPetkov.bearFrameworkAddons.formSubmit.initialize(' . json_encode($initializeData) . ');';
+            $package->get = 'return ivoPetkov.bearFrameworkAddons.formSubmit;';
         });
 

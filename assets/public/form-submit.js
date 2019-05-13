@@ -5,6 +5,8 @@
  * Free to use under the MIT license.
  */
 
+/* global clientPackages */
+
 var ivoPetkov = ivoPetkov || {};
 ivoPetkov.bearFrameworkAddons = ivoPetkov.bearFrameworkAddons || {};
 ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSubmit || (function () {
@@ -41,7 +43,7 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
             data['serverData'] = formData.serverData;
             data['values'] = JSON.stringify(values);
 
-            clientShortcuts.get('serverRequests').then(function (serverRequests) {
+            clientPackages.get('serverRequests').then(function (serverRequests) {
                 serverRequests.send('ivopetkov-form', data)
                         .then(function (responseText) {
                             try {

@@ -37,7 +37,7 @@ $initializeData = [
     __('ivopetkov.form.Error occurred. Please, try again later.')
 ];
 
-$html = '<head><link rel="client-shortcuts-embed" name="form"></head>';
-$html .= '<body><script>clientShortcuts.get(\'form\').then(function(form){form.initialize(' . json_encode($initializeData) . ');});</script></body>';
+$html = '<head><link rel="client-packages-embed" name="form"></head>';
+$html .= '<body><script>clientPackages.get(\'form\').then(function(form){form.initialize(' . json_encode($initializeData) . ');});</script></body>';
 $domDocument->insertHTML($html);
 echo $domDocument->saveHTML();
