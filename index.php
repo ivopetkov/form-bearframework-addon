@@ -18,7 +18,7 @@ $context->classes
         ->add('IvoPetkov\BearFrameworkAddons\Form\*', 'classes/Form/*.php');
 
 $context->assets
-        ->addDir('assets');
+        ->addDir('assets/public');
 
 $app->localization
         ->addDictionary('en', function() use ($context) {
@@ -159,8 +159,8 @@ $app->clientPackages
 
             $package->get = 'return ivoPetkov.bearFrameworkAddons.form;';
         })
-        ->add('-form-submit', md5('1' . $app->request->base), function(IvoPetkov\BearFrameworkAddons\ClientPackage $package) use ($app, $context) {
-            $package->addJSFile($context->assets->getURL('assets/form-submit.min.js', ['cacheMaxAge' => 999999999, 'version' => 2, 'robotsNoIndex' => true]));
+        ->add('-form-submit', md5('2' . $app->request->base), function(IvoPetkov\BearFrameworkAddons\ClientPackage $package) use ($app, $context) {
+            $package->addJSFile($context->assets->getURL('assets/public/form-submit.min.js', ['cacheMaxAge' => 999999999, 'version' => 2, 'robotsNoIndex' => true]));
 
             $package->preparePackage('serverRequests');
             
