@@ -14,10 +14,12 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
     var formSubmitData = null;
 
     var initialize = function (data) {
-        formSubmitData = {
-            'errorTooltipData': data[0],
-            'filesUploadUrl': data[1]
-        };
+        if (formSubmitData === null) {
+            formSubmitData = {
+                'errorTooltipData': data[0],
+                'filesUploadUrl': data[1]
+            };
+        }
     };
 
     var submit = function (formElement, formData, dispatchEvent, onEnd) {

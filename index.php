@@ -145,8 +145,8 @@ $app->serverRequests
         });
 
 $app->clientPackages
-        ->add('form', 1, function(IvoPetkov\BearFrameworkAddons\ClientPackage $package) use ($context) {
-            $code = include $context->dir.'/assets/form.min.js.php';
+        ->add('form', function(IvoPetkov\BearFrameworkAddons\ClientPackage $package) use ($context) {
+            $code = include $context->dir . '/assets/form.min.js.php';
             //$code = file_get_contents($context->dir . '/dev/form.js');
             $package->addJSCode($code);
 
@@ -155,15 +155,11 @@ $app->clientPackages
                     . 'form[data-form-id][disabled]:before{content:"";display:block;position:absolute;width:100%;height:100%;}';
             $package->addCSSCode($code);
 
-            $package->preparePackage('-form-submit');
-
             $package->get = 'return ivoPetkov.bearFrameworkAddons.form;';
         })
-        ->add('-form-submit', md5('2' . $app->request->base), function(IvoPetkov\BearFrameworkAddons\ClientPackage $package) use ($app, $context) {
-            $package->addJSFile($context->assets->getURL('assets/public/form-submit.min.js', ['cacheMaxAge' => 999999999, 'version' => 2, 'robotsNoIndex' => true]));
+        ->add('-form-submit', function(IvoPetkov\BearFrameworkAddons\ClientPackage $package) use ($app, $context) {
+            $package->addJSFile($context->assets->getURL('assets/public/form-submit.min.js', ['cacheMaxAge' => 999999999, 'version' => 3, 'robotsNoIndex' => true]));
 
-            $package->preparePackage('serverRequests');
-            
             $getTooltipData = function($style = '') use ($package) { //$style = 'background:rgba(255,0,0,.8);arrow-size:8px;';
                 $arrowSize = null;
                 $backgroundColor = null;
@@ -213,7 +209,6 @@ $app->clientPackages
                 $app->urls->get('/-ivopetkov-form-files-upload/')
             ];
 
-            $package->init = 'ivoPetkov.bearFrameworkAddons.formSubmit.initialize(' . json_encode($initializeData) . ');';
-            $package->get = 'return ivoPetkov.bearFrameworkAddons.formSubmit;';
+            $package->get = 'ivoPetkov.bearFrameworkAddons.formSubmit.initialize(' . json_encode($initializeData) . ');return ivoPetkov.bearFrameworkAddons.formSubmit;';
         });
 
