@@ -11,7 +11,7 @@ use BearFramework\App;
 use IvoPetkov\HTML5DOMDocument;
 
 $app = App::get();
-$context = $app->contexts->get(__FILE__);
+$context = $app->contexts->get(__DIR__);
 
 $id = md5(uniqid() . 'form');
 $component->src = "file:" . $component->filename;
