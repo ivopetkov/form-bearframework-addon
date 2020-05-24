@@ -158,7 +158,7 @@ $app->clientPackages
             $package->get = 'return ivoPetkov.bearFrameworkAddons.form;';
         })
         ->add('-form-submit', function(IvoPetkov\BearFrameworkAddons\ClientPackage $package) use ($app, $context) {
-            $package->addJSFile($context->assets->getURL('assets/public/form-submit.min.js', ['cacheMaxAge' => 999999999, 'version' => 3, 'robotsNoIndex' => true]));
+            $package->addJSFile($context->assets->getURL('assets/public/form-submit.min.js', ['cacheMaxAge' => 999999999, 'version' => 4, 'robotsNoIndex' => true]));
 
             $getTooltipData = function($style = '') use ($package) { //$style = 'background:rgba(255,0,0,.8);arrow-size:8px;';
                 $arrowSize = null;

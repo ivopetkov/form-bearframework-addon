@@ -31,7 +31,7 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
         };
 
         var dispatchSuccess = function (result) {
-            dispatchEvent('submitsuccess', {'result': result});
+            dispatchEvent('submitsuccess', { 'result': result });
             dispatchEnd();
         };
 
@@ -47,39 +47,39 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
 
             clientPackages.get('serverRequests').then(function (serverRequests) {
                 serverRequests.send('ivopetkov-form', data)
-                        .then(function (responseText) {
-                            try {
-                                var response = JSON.parse(responseText);
-                            } catch (e) {
-                                var response = {};
-                            }
-                            if (typeof response.status !== 'undefined') {
-                                if (response.status === '0') {
-                                    dispatchError();
-                                    if (typeof response.error.element !== 'undefined' && response.error.element.length > 0) {
-                                        var invalidElement = formElement.querySelector('[name="' + response.error.element + '"]');
-                                        if (invalidElement !== null) {
-                                            invalidElement.focus();
-                                        }
-                                    }
-                                    if (typeof response.error.message !== 'undefined' && response.error.message.length > 0) {
-                                        if (typeof response.error.element !== 'undefined' && response.error.element.length > 0 && invalidElement !== null) {
-                                            createTooltip(invalidElement, response.error.message);
-                                        } else {
-                                            createTooltip(formElement, response.error.message);
-                                        }
-                                    }
-                                } else if (response.status === '1') {
-                                    dispatchSuccess(response.result);
-                                }
-                            } else {
+                    .then(function (responseText) {
+                        try {
+                            var response = JSON.parse(responseText);
+                        } catch (e) {
+                            var response = {};
+                        }
+                        if (typeof response.status !== 'undefined') {
+                            if (response.status === '0') {
                                 dispatchError();
+                                if (typeof response.error.element !== 'undefined' && response.error.element.length > 0) {
+                                    var invalidElement = formElement.querySelector('[name="' + response.error.element + '"]');
+                                    if (invalidElement !== null) {
+                                        invalidElement.focus();
+                                    }
+                                }
+                                if (typeof response.error.message !== 'undefined' && response.error.message.length > 0) {
+                                    if (typeof response.error.element !== 'undefined' && response.error.element.length > 0 && invalidElement !== null) {
+                                        createTooltip(invalidElement, response.error.message);
+                                    } else {
+                                        createTooltip(formElement, response.error.message);
+                                    }
+                                }
+                            } else if (response.status === '1') {
+                                dispatchSuccess(response.result);
                             }
-                        })
-                        .catch(function () {
+                        } else {
                             dispatchError();
-                            createTooltip(formElement, formData.errorMessage);
-                        });
+                        }
+                    })
+                    .catch(function () {
+                        dispatchError();
+                        createTooltip(formElement, formData.errorMessage);
+                    });
             });
 
         };
@@ -145,6 +145,13 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
                         values[elementName] = {
                             'type': elementType,
                             'value': ''
+                        };
+                    }
+                } else if (elementType === 'checkbox') {
+                    if (element.checked) {
+                        values[elementName] = {
+                            'type': elementType,
+                            'value': element.value
                         };
                     }
                 } else {
