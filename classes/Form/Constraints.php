@@ -151,5 +151,4 @@ class Constraints
         }
         return !$hasErrors;
     }
-
 }
