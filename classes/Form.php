@@ -60,5 +60,4 @@ class Form
         $exception->errorMessage = $message;
         throw $exception;
     }
-
 }
