@@ -147,7 +147,7 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
                             'value': ''
                         };
                     }
-                } else if (elementType === 'checkbox') {
+                } else if (elementType === 'checkbox' || elementType === 'radio') {
                     if (element.checked) {
                         values[elementName] = {
                             'type': elementType,
