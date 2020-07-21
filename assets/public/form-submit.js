@@ -238,4 +238,4 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
         'submit': submit
     };
 
-}());
+})();
