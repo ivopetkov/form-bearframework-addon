@@ -9,11 +9,11 @@
 
 var ivoPetkov = ivoPetkov || {};
 ivoPetkov.bearFrameworkAddons = ivoPetkov.bearFrameworkAddons || {};
-ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSubmit || (function () {
+ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSubmit || (() => {
 
     var formSubmitData = null;
 
-    var initialize = function (data) {
+    var initialize = (data) => {
         if (formSubmitData === null) {
             formSubmitData = {
                 'errorTooltipData': data[0],
@@ -22,7 +22,7 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
         }
     };
 
-    var submit = function (formElement, formData, dispatchEvent, onEnd) {
+    var submit = (formElement, formData, dispatchEvent, onEnd) => {
         var values = {};
 
         var dispatchEnd = async () => {
