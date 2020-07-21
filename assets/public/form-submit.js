@@ -25,19 +25,19 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
     var submit = function (formElement, formData, dispatchEvent, onEnd) {
         var values = {};
 
-        var dispatchEnd = function () {
-            dispatchEvent('submitend');
-            onEnd();
+        var dispatchEnd = async () => {
+            await dispatchEvent('submitend');
+            await onEnd();
         };
 
-        var dispatchSuccess = function (result) {
-            dispatchEvent('submitsuccess', { 'result': result });
-            dispatchEnd();
+        var dispatchSuccess = async (result) => {
+            await dispatchEvent('submitsuccess', { 'result': result });
+            await dispatchEnd();
         };
 
-        var dispatchError = function () {
-            dispatchEvent('submiterror');
-            dispatchEnd();
+        var dispatchError = async () => {
+            await dispatchEvent('submiterror');
+            await dispatchEnd();
         };
 
         var sendSubmitRequest = function () {
@@ -47,7 +47,7 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
 
             clientPackages.get('serverRequests').then(function (serverRequests) {
                 serverRequests.send('ivopetkov-form', data)
-                    .then(function (responseText) {
+                    .then(async (responseText) => {
                         try {
                             var response = JSON.parse(responseText);
                         } catch (e) {
@@ -55,7 +55,7 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
                         }
                         if (typeof response.status !== 'undefined') {
                             if (response.status === '0') {
-                                dispatchError();
+                                await dispatchError();
                                 if (typeof response.error.element !== 'undefined' && response.error.element.length > 0) {
                                     var invalidElement = formElement.querySelector('[name="' + response.error.element + '"]');
                                     if (invalidElement !== null) {
@@ -70,14 +70,14 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
                                     }
                                 }
                             } else if (response.status === '1') {
-                                dispatchSuccess(response.result);
+                                await dispatchSuccess(response.result);
                             }
                         } else {
-                            dispatchError();
+                            await dispatchError();
                         }
                     })
-                    .catch(function () {
-                        dispatchError();
+                    .catch(async () => {
+                        await dispatchError();
                         createTooltip(formElement, formData.errorMessage);
                     });
             });

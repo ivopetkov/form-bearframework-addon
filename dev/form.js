@@ -60,7 +60,7 @@ ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (func
         }
     };
 
-    var submit = function (id) {
+    var submit = async (id) => {
         var formElement = getFormElement(id);
         if (formElement !== null) {
             var formData = forms[id];
@@ -68,7 +68,7 @@ ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (func
                 return;
             }
 
-            var dispatchEvent = function (name, data) {
+            var dispatchEvent = async (name, data) => {
                 var event = makeEvent(name);
                 if (typeof data !== 'undefined') {
                     for (var key in data) {
@@ -80,24 +80,28 @@ ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (func
                     formElement.removeAttribute('disabled'); // The events does not work in IE 11 if disabled
                     updateDisabled = true;
                 }
+                event.promisesToWait = [];
                 var result = formElement.dispatchEvent(event);
+                if (event.promisesToWait.length > 0) {
+                    await Promise.allSettled(event.promisesToWait);
+                }
                 if (updateDisabled) {
                     formElement.setAttribute('disabled', 'true');
                 }
                 return result;
             };
 
-            var cancelled = !dispatchEvent('beforesubmit');
-            if (cancelled) {
+            var result = await dispatchEvent('beforesubmit');
+            if (!result) {
                 return;
             }
             formData.status = 1;
 
             disableOrEnable(id, true);
-            dispatchEvent('submitstart');
+            await dispatchEvent('submitstart');
 
             clientPackages.get('-form-submit').then(function (formSubmit) {
-                formSubmit.submit(formElement, formData, dispatchEvent, function () {
+                formSubmit.submit(formElement, formData, dispatchEvent, () => {
                     formData.status = 0;
                     disableOrEnable(id, false);
                 });
