@@ -197,7 +197,20 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
     };
 
     var createTooltip = function (target, text) {
+        for (var i = 0; i < 1000; i++) {
+            var targetCoordinates = getElementCoordinates(target);
+            if (targetCoordinates[0] === 0 && targetCoordinates[1] === 0) { // check may be hidden (radio box input for example)
+                target = target.parentNode;
+            } else {
+                break;
+            }
+        }
+        if (target === null || typeof target.tagName === 'undefined') {
+            return;
+        }
+
         var element = document.createElement('a');
+        element.setAttribute('data-form-component', 'tooltip');
         element.className = formSubmitData.errorTooltipData['className'];
         element.innerText = text;
         element.style.left = '-1000px';

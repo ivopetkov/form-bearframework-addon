@@ -125,15 +125,19 @@ class Constraints
      * 
      * @param array $values The values to checks
      * @param array $errorsList List of validation errors
+     * @param array $itemsToSkip List of validation errors
      * @return bool TRUE if no validation errors found. FALSE otherwise.
      */
-    public function validate(array $values, array &$errorsList): bool
+    public function validate(array $values, array &$errorsList, array $itemsToSkip = []): bool
     {
         $hasErrors = false;
         foreach ($this->data as $item) {
             $type = $item[0];
             $errorMessage = $item[1];
             $elementName = $item[2];
+            if (array_search($elementName, $itemsToSkip) !== false) {
+                continue;
+            }
             $value = isset($values[$elementName]) ? (string) $values[$elementName] : '';
             $hasError = false;
             if ($type === 'required') {

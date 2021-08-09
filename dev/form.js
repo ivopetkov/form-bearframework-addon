@@ -38,6 +38,7 @@ ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (func
             'errorMessage': data[2],
             'status': 0 // 1 - submitting
         };
+        var dependencies = data[3];
         var formElement = getFormElement(id);
         if (formElement !== null) {
             formElement.submit = function () {
@@ -57,6 +58,127 @@ ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (func
             processEventAttributes('submitend');
             processEventAttributes('submitsuccess');
             processEventAttributes('submiterror');
+
+            var getElements = function (name) {
+                var elements = document.querySelectorAll('[data-form-element-type]');
+                var result = [];
+                for (var i = 0; i < elements.length; i++) {
+                    if (elements[i].querySelector('[name="' + name + '"]') !== null) {
+                        result.push(elements[i]);
+                    }
+                }
+                return result;
+            };
+
+            var getValue = function (name) {
+                var elements = getElements(name);
+                if (elements.length > 0) {
+                    if (elements[0].getAttribute('data-form-element-type') === 'radio') {
+                        for (var i = 0; i < elements.length; i++) {
+                            if (elements[i].isChecked()) {
+                                return elements[i].getValue();
+                            }
+                        }
+                    } else {
+                        return elements[0].getValue();
+                    }
+                }
+                return null;
+            };
+
+            var checkDependency = function (dependency) {
+                if (dependency[0] === 'AND' || dependency[0] === 'OR') { // Complex dependency
+                    var isAnd = dependency[0] === 'AND';
+                    var result = false;
+                    for (var i = 1; i < dependency.length; i++) {
+                        if (checkDependency(dependency[i])) {
+                            if (isAnd) {
+                                var result = true;
+                            } else {
+                                var result = true;
+                                break;
+                            }
+                        } else {
+                            if (isAnd) {
+                                return false;
+                            }
+                        }
+                    }
+                    return result;
+                } else { // Simple dependency
+                    var elementName = dependency[0];
+                    var checkType = dependency[1];
+                    if (checkType === 'value') {
+                        var checkValue = dependency[2];
+                        var elementValue = getValue(elementName);
+                        if (typeof checkValue !== 'string') { // is array
+                            if (checkValue.indexOf(elementValue) !== -1) {
+                                return true;
+                            }
+                        } else {
+                            if (elementValue === checkValue) {
+                                return true;
+                            }
+                        }
+                    } else if (checkType === 'checked') {
+                        var elements = getElements(elementName);
+                        if (elements.length > 0) {
+                            if (elements[0].getAttribute('data-form-element-type') === 'checkbox') {
+                                return elements[0].isChecked();
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+
+            var getDependentByElementNames = function (dependency) {
+                var result = [];
+                if (dependency[0] === 'AND' || dependency[0] === 'OR') { // Complex dependency
+                    for (var i = 1; i < dependency.length; i++) {
+                        result = result.concat(getDependentByElementNames(dependency[i]));
+                    }
+                    return result;
+                } else { // Simple dependency
+                    result.push(dependency[0]);
+                }
+                return result;
+            };
+            var onChangeElements = [];
+            for (var i = 0; i < dependencies.length; i++) {
+                var dependency = dependencies[i][2];
+                onChangeElements = onChangeElements.concat(getDependentByElementNames(dependency));
+            }
+
+            var update = function () {
+                for (var i = 0; i < dependencies.length; i++) {
+                    var elementName = dependencies[i][1];
+                    var dependency = dependencies[i][2];
+                    var elements = getElements(elementName);
+                    if (dependencies[i][0] === 'visible') {
+                        var visible = checkDependency(dependency);
+                        for (var j = 0; j < elements.length; j++) {
+                            if (typeof elements[j].setVisibility !== 'undefined') {
+                                elements[j].setVisibility(visible);
+                            }
+                        }
+                    }
+                }
+            };
+
+            var updatedElements = [];
+            for (var i = 0; i < onChangeElements.length; i++) {
+                var elementName = onChangeElements[i];
+                if (typeof updatedElements[elementName] !== 'undefined') {
+                    continue;
+                }
+                updatedElements[elementName] = 1;
+                var elements = getElements(elementName);
+                for (var j = 0; j < elements.length; j++) {
+                    elements[j].addEventListener('change', update); // the event bubbles from the inputs
+                }
+            }
+
         }
     };
 

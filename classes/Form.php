@@ -28,11 +28,18 @@ class Form
     public $constraints;
 
     /**
+     *
+     * @var \IvoPetkov\BearFrameworkAddons\Form\Dependencies
+     */
+    public $dependencies;
+
+    /**
      * 
      */
     function __construct()
     {
         $this->constraints = new Form\Constraints();
+        $this->dependencies = new Form\Dependencies();
     }
 
     /**
@@ -43,7 +50,7 @@ class Form
     public function throwError(string $message = null): void
     {
         $exception = new Form\Internal\ErrorException('');
-        $exception->errorMessage = $message;
+        $exception->errorMessage = $message !== null ? $message : __('ivopetkov.form.Error occurred. Please, try again later.');
         throw $exception;
     }
 
@@ -57,7 +64,7 @@ class Form
     {
         $exception = new Form\Internal\ErrorException('');
         $exception->elementName = $elementName;
-        $exception->errorMessage = $message;
+        $exception->errorMessage = $message !== null ? $message : __('ivopetkov.form.Error occurred. Please, try again later.');
         throw $exception;
     }
 }

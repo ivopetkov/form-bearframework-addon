@@ -112,8 +112,13 @@ $app->serverRequests
                         }
                     }
 
+                    $hiddenElements = $form->dependencies->getHiddenElements($values);
+                    foreach ($hiddenElements as $hiddenElement) {
+                        $values[$hiddenElement] = '';
+                    }
+
                     $errorsList = [];
-                    if (!$form->constraints->validate($values, $errorsList)) {
+                    if (!$form->constraints->validate($values, $errorsList, $hiddenElements)) {
                         return json_encode([
                             'status' => '0',
                             'error' => [
