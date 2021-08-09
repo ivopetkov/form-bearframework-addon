@@ -88,6 +88,22 @@ class Constraints
     }
 
     /**
+     * Requires the element value to be a valid phone number
+     * 
+     * @param string $elementName The element name
+     * @param string $errorMessage Error message
+     * @return \IvoPetkov\BearFrameworkAddons\Form\Constraints Returns a reference to itself.
+     */
+    public function setPhone(string $elementName, string $errorMessage = null): \IvoPetkov\BearFrameworkAddons\Form\Constraints
+    {
+        if ($errorMessage === null) {
+            $errorMessage = __('ivopetkov.form.This is not a valid phone number.');
+        }
+        $this->data[] = ['phone', $errorMessage, $elementName];
+        return $this;
+    }
+
+    /**
      * Performs a regular expression validation
      * 
      * @param string $elementName The element name
@@ -133,11 +149,21 @@ class Constraints
                     $hasError = true;
                 }
             } elseif ($type === 'email') {
-                if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
-                    $hasError = true;
+                $valueLength = strlen($value);
+                if ($valueLength > 0) {
+                    if ($valueLength > 200 || filter_var($value, FILTER_VALIDATE_EMAIL) === false) {
+                        $hasError = true;
+                    }
+                }
+            } elseif ($type === 'phone') {
+                $valueLength = strlen($value);
+                if ($valueLength > 0) {
+                    if ($valueLength > 30 || $valueLength < 3 || filter_var($value, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => '/^[+]?[0-9 \-]*$/']]) === false) {
+                        $hasError = true;
+                    }
                 }
             } elseif ($type === 'regExp') {
-                if (!filter_var($value, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => $item[3]]])) {
+                if (filter_var($value, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => $item[3]]]) === false) {
                     $hasError = true;
                 }
             }
