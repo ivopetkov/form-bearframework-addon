@@ -60,11 +60,17 @@ ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (func
             processEventAttributes('submiterror');
 
             var getElements = function (name) {
-                var elements = document.querySelectorAll('[data-form-element-type]');
+                if (typeof name === 'undefined') {
+                    name = null;
+                }
+                var elements = formElement.querySelectorAll('[data-form-element-type]');
                 var result = [];
                 for (var i = 0; i < elements.length; i++) {
-                    if (elements[i].querySelector('[name="' + name + '"]') !== null) {
-                        result.push(elements[i]);
+                    var element = elements[i];
+                    if (name === null) {
+                        result.push(element);
+                    } else if (element.querySelector('[name="' + name + '"]') !== null) {
+                        result.push(element);
                     }
                 }
                 return result;
@@ -179,6 +185,17 @@ ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (func
                 }
             }
 
+            var allElements = getElements();
+            for (var i = 0; i < allElements.length; i++) {
+                var element = allElements[i];
+                if (element.getAttribute('data-form-element-type') === 'textbox') {
+                    element.addEventListener('keydown', function (e) {
+                        if (e.keyCode === 13) {
+                            submit(id);
+                        }
+                    });
+                }
+            }
         }
     };
 

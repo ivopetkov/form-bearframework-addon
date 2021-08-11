@@ -22,8 +22,16 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
         }
     };
 
+    var tooltipsToHide = [];
+
     var submit = (formElement, formData, dispatchEvent, onEnd) => {
         var values = {};
+
+        // Clear previous tooltips when submiting with Enter key
+        for (var i = 0; i < tooltipsToHide.length; i++) {
+            tooltipsToHide[i]();
+        }
+        tooltipsToHide = [];
 
         var dispatchEnd = async () => {
             await dispatchEvent('submitend');
@@ -239,11 +247,16 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
         updatePosition();
         var intervalID = window.setInterval(updatePosition, 100);
         var hide = function () {
-            element.parentNode.removeChild(element);
+            try {
+                element.parentNode.removeChild(element);
+            } catch (e) {
+
+            }
             window.removeEventListener('click', hide);
             window.clearInterval(intervalID);
         };
         window.addEventListener('click', hide);
+        tooltipsToHide.push(hide);
     };
 
     return {
