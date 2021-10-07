@@ -16,8 +16,7 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
     var initialize = (data) => {
         if (formSubmitData === null) {
             formSubmitData = {
-                'errorTooltipData': data[0],
-                'filesUploadUrl': data[1]
+                'filesUploadUrl': data[0]
             };
         }
     };
@@ -190,6 +189,20 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
         return [rectangle.width, rectangle.height];
     };
 
+    var getTooltipFixedContainer = function (element) {
+        while (element.parentNode && typeof element.parentNode.tagName !== "undefined") {
+            var style = window.getComputedStyle(element, null);
+            if (style === null) {
+                return null;
+            }
+            if (style.position === "fixed" && element.getAttribute('data-form-tooltip-container') !== null) {
+                return element;
+            }
+            element = element.parentNode;
+        }
+        return null;
+    };
+
     var hasFixedParent = function (element) {
         while (element.parentNode && typeof element.parentNode.tagName !== "undefined") {
             var style = window.getComputedStyle(element, null);
@@ -228,30 +241,40 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
 
         var element = document.createElement('a');
         element.setAttribute('data-form-component', 'tooltip');
-        element.className = formSubmitData.errorTooltipData['className'];
         element.innerText = text;
         element.style.left = '-1000px';
         element.style.top = '-1000px';
-        var targetHasFixedParent = hasFixedParent(target);
+        var fixedContainer = getTooltipFixedContainer(target);
+        var hasFixedContainer = fixedContainer !== null;
+        var targetHasFixedParent = !hasFixedContainer && hasFixedParent(target);
         if (targetHasFixedParent) {
             element.style.position = 'fixed';
         }
-        document.body.appendChild(element);
+        if (hasFixedContainer) {
+            fixedContainer.appendChild(element);
+        } else {
+            document.body.appendChild(element);
+        }
         var updatePosition = function () {
             var targetCoordinates = getElementCoordinates(target);
             var targetSize = getElementSize(target);
             var tooltipSize = getElementSize(element);
+            var arrowSize = getComputedStyle(element).getPropertyValue('--form-tooltip-arrow-size');
             var left = targetCoordinates[0] + (targetSize[0] - tooltipSize[0]) / 2;
             if (left < 5) {
                 left = 5;
             }
             var top = targetCoordinates[1] - tooltipSize[1] - 2;
-            if (targetHasFixedParent) {
+            if (hasFixedContainer) {
+                var fixedContainerCoordinates = getElementCoordinates(fixedContainer);
+                left -= fixedContainerCoordinates[0] - fixedContainer.scrollLeft;
+                top -= fixedContainerCoordinates[1] - fixedContainer.scrollTop;
+            } else if (targetHasFixedParent) {
                 left -= window.pageXOffset;
                 top -= window.pageYOffset;
             }
             element.style.left = left + 'px';
-            element.style.top = 'calc(' + top + 'px - ' + formSubmitData.errorTooltipData['arrowSize'] + ')';
+            element.style.top = 'calc(' + top + 'px - ' + arrowSize + ')';
         };
         updatePosition();
         var intervalID = window.setInterval(updatePosition, 100);

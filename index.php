@@ -164,54 +164,13 @@ $app->clientPackages
     })
     ->add('-form-submit', function (IvoPetkov\BearFrameworkAddons\ClientPackage $package) use ($app, $context) {
         //$package->addJSCode(file_get_contents($context->dir . '/assets/public/form-submit.js'));
-        $package->addJSFile($context->assets->getURL('assets/public/form-submit.min.js', ['cacheMaxAge' => 999999999, 'version' => 7, 'robotsNoIndex' => true]));
+        $package->addJSFile($context->assets->getURL('assets/public/form-submit.min.js', ['cacheMaxAge' => 999999999, 'version' => 8, 'robotsNoIndex' => true]));
 
-        $getTooltipData = function ($style = '') use ($package) { //$style = 'background:rgba(255,0,0,.8);arrow-size:8px;';
-            $arrowSize = null;
-            $backgroundColor = null;
-            $styleParts = explode(';', $style);
-            $arrowSizeIndex = null;
-            foreach ($styleParts as $index => $stylePart) {
-                $stylePart = explode(':', $stylePart);
-                if (isset($stylePart[0], $stylePart[1])) {
-                    if ($stylePart[0] === 'arrow-size') {
-                        $arrowSize = $stylePart[1];
-                        $arrowSizeIndex = $index;
-                    } elseif ($stylePart[0] === 'background') {
-                        $backgroundColor = $stylePart[1]; // todo find color
-                    } elseif ($stylePart[0] === 'background-color') {
-                        $backgroundColor = $stylePart[1];
-                    }
-                }
-            }
-            if ($arrowSizeIndex !== null) {
-                unset($styleParts[$arrowSizeIndex]);
-                $style = implode(';', $styleParts);
-            }
-            if ($arrowSize === null) {
-                $arrowSize = '8px';
-            }
-            if ($backgroundColor === null) {
-                $backgroundColor = 'rgba(0,0,0,.9)';
-            }
-
-            $elementStyle = 'display:inline-block;background:' . $backgroundColor . ';border-radius:2px;font-family:Arial;font-size:14px;color:#fff;padding:13px 15px;position:absolute;z-index:10030000;max-width:220px;user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none;cursor:default;text-align:center;' . $style;
-            $elementBeforeStyle = 'border:solid;border-color:' . $backgroundColor . ' transparent;border-width:' . $arrowSize . ' ' . $arrowSize . ' 0 ' . $arrowSize . ';bottom:-' . $arrowSize . ';content:"";left:calc(50% - ' . $arrowSize . ');position:absolute;';
-
-            $tooltipClassName = 'ipform' . md5($elementStyle . $elementBeforeStyle);
-            $style = '.' . $tooltipClassName . '{' . $elementStyle . '}'
-                . '.' . $tooltipClassName . ':before{' . $elementBeforeStyle . '}';
-
-            $package->addCSSCode($style);
-
-            return [
-                'className' => $tooltipClassName,
-                'arrowSize' => $arrowSize
-            ];
-        };
+        $style = '[data-form-component="tooltip"]{--form-tooltip-background-color:#111;--form-tooltip-arrow-size:8px;display:inline-block;background:var(--form-tooltip-background-color);border-radius:2px;font-family:Arial;font-size:14px;color:#fff;padding:13px 15px;position:absolute;z-index:10030000;max-width:220px;user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none;cursor:default;text-align:center;}';
+        $style .= '[data-form-component="tooltip"]:before{border:solid;border-color:var(--form-tooltip-background-color) transparent;border-width:var(--form-tooltip-arrow-size) var(--form-tooltip-arrow-size) 0 var(--form-tooltip-arrow-size);bottom:calc(0px - var(--form-tooltip-arrow-size));content:"";left:calc(50% - var(--form-tooltip-arrow-size));position:absolute;}';
+        $package->addCSSCode($style);
 
         $initializeData = [
-            $getTooltipData(),
             $app->urls->get('/-ivopetkov-form-files-upload/')
         ];
 
