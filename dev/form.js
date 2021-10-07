@@ -185,13 +185,27 @@ ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (func
                 }
             }
 
+            var submitOnEnterKey = function () {
+                submit(id);
+                var allElements = getElements();
+
+                // scroll to the first submit button
+                for (var i = 0; i < allElements.length; i++) {
+                    var element = allElements[i];
+                    if (element.getAttribute('data-form-element-type') === 'submit-button') {
+                        element.scrollIntoView(false);
+                        break;
+                    }
+                }
+            };
+
             var allElements = getElements();
             for (var i = 0; i < allElements.length; i++) {
                 var element = allElements[i];
                 if (element.getAttribute('data-form-element-type') === 'textbox') {
                     element.addEventListener('keydown', function (e) {
                         if (e.keyCode === 13) {
-                            submit(id);
+                            submitOnEnterKey();
                         }
                     });
                 }

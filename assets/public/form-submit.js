@@ -48,6 +48,15 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
             await dispatchEnd();
         };
 
+        var showFormError = function (message) {
+            var element = formElement.querySelector('[data-form-element-type="submit-button"]');
+            if (element !== null) {
+                createTooltip(element, message);
+            } else {
+                alert(message);
+            }
+        };
+
         var sendSubmitRequest = function () {
             var data = {};
             data['serverData'] = formData.serverData;
@@ -74,7 +83,7 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
                                     if (typeof response.error.element !== 'undefined' && response.error.element.length > 0 && invalidElement !== null) {
                                         createTooltip(invalidElement, response.error.message);
                                     } else {
-                                        createTooltip(formElement, response.error.message);
+                                        showFormError(response.error.message);
                                     }
                                 }
                             } else if (response.status === '1') {
@@ -86,7 +95,7 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
                     })
                     .catch(async () => {
                         await dispatchError();
-                        createTooltip(formElement, formData.errorMessage);
+                        showFormError(formData.errorMessage);
                     });
             });
 
