@@ -277,6 +277,7 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
             element.style.top = 'calc(' + top + 'px - ' + arrowSize + ')';
         };
         updatePosition();
+        element.scrollIntoView();
         var intervalID = window.setInterval(updatePosition, 100);
         var hide = function () {
             try {
