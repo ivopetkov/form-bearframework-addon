@@ -286,9 +286,11 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
 
             }
             window.removeEventListener('click', hide);
+            window.removeEventListener('keydown', hide);
             window.clearInterval(intervalID);
         };
         window.addEventListener('click', hide);
+        window.addEventListener('keydown', hide);
         tooltipsToHide.push(hide);
     };
 
