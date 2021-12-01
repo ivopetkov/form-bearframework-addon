@@ -132,7 +132,7 @@ class Dependencies
             if (sizeof($elements) > 0) {
                 if ($elements[0]->tagName === 'form-element-radio') {
                     foreach ($elements as $element) {
-                        if (strlen($element->getAttribute('checked')) > 0) {
+                        if (strlen((string)$element->getAttribute('checked')) > 0) {
                             return $element->getAttribute('value');
                         }
                     }
@@ -146,7 +146,7 @@ class Dependencies
             $elements = $getElements($name);
             if (sizeof($elements) > 0) {
                 if ($elements[0]->tagName === 'form-element-checkbox') {
-                    return strlen($elements[0]->getAttribute('checked')) > 0;
+                    return strlen((string)$elements[0]->getAttribute('checked')) > 0;
                 }
             }
             return false;
