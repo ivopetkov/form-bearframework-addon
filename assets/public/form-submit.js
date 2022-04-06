@@ -226,6 +226,11 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
         return [left, top];
     };
 
+    var isElementOutsideViewport = function (element) {
+        var rect = element.getBoundingClientRect();
+        return rect.bottom < 0 || rect.right < 0 || rect.left > window.innerWidth || rect.top > window.innerHeight;
+    }
+
     var createTooltip = function (target, text) {
         for (var i = 0; i < 1000; i++) {
             var targetCoordinates = getElementCoordinates(target);
@@ -277,7 +282,9 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
             element.style.top = 'calc(' + top + 'px - ' + arrowSize + ')';
         };
         updatePosition();
-        element.scrollIntoView();
+        if (isElementOutsideViewport(element)) {
+            element.scrollIntoView();
+        }
         var intervalID = window.setInterval(updatePosition, 100);
         var hide = function () {
             try {
