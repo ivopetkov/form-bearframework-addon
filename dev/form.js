@@ -20,7 +20,6 @@ ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (func
         return null;
     };
 
-
     var makeEvent = function (name) {
         if (typeof Event === 'function') {
             return new Event(name);
@@ -210,6 +209,15 @@ ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (func
                     });
                 }
             }
+
+            formElement.addEventListener('reset', function () {
+                var elements = formElement.querySelectorAll('input, select, textarea');
+                var elementsCount = elements.length;
+                for (var i = 0; i < elementsCount; i++) {
+                    var element = elements[i];
+                    element.dispatchEvent(new Event('change')); // some elements need this to update custom values
+                }
+            });
         }
     };
 
