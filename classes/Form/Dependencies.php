@@ -27,9 +27,9 @@ class Dependencies
      * 
      * @param string $elementName
      * @param array $dependency
-     * @return \IvoPetkov\BearFrameworkAddons\Form\Dependencies
+     * @return self
      */
-    public function setVisible(string $elementName, array $dependency): \IvoPetkov\BearFrameworkAddons\Form\Dependencies
+    public function setVisible(string $elementName, array $dependency): self
     {
         $this->data[] = ['visible', $elementName, $dependency];
         return $this;

@@ -26,9 +26,9 @@ class Constraints
      * 
      * @param string $elementName The element name
      * @param string $errorMessage Error message
-     * @return \IvoPetkov\BearFrameworkAddons\Form\Constraints Returns a reference to itself.
+     * @return self Returns a reference to itself.
      */
-    public function setRequired(string $elementName, string $errorMessage = null): \IvoPetkov\BearFrameworkAddons\Form\Constraints
+    public function setRequired(string $elementName, string $errorMessage = null): self
     {
         if ($errorMessage === null) {
             $errorMessage = __('ivopetkov.form.This field is required.');
@@ -43,9 +43,9 @@ class Constraints
      * @param string $elementName The element name
      * @param int $minLength
      * @param string $errorMessage Error message
-     * @return \IvoPetkov\BearFrameworkAddons\Form\Constraints Returns a reference to itself.
+     * @return self Returns a reference to itself.
      */
-    public function setMinLength(string $elementName, int $minLength, string $errorMessage = null): \IvoPetkov\BearFrameworkAddons\Form\Constraints
+    public function setMinLength(string $elementName, int $minLength, string $errorMessage = null): self
     {
         if ($errorMessage === null) {
             $errorMessage = sprintf(__('ivopetkov.form.The length of this field must be atleast %s characters.'), $minLength);
@@ -60,9 +60,9 @@ class Constraints
      * @param string $elementName The element name
      * @param int $maxLength
      * @param string $errorMessage Error message
-     * @return \IvoPetkov\BearFrameworkAddons\Form\Constraints Returns a reference to itself.
+     * @return self Returns a reference to itself.
      */
-    public function setMaxLength(string $elementName, int $maxLength, string $errorMessage = null): \IvoPetkov\BearFrameworkAddons\Form\Constraints
+    public function setMaxLength(string $elementName, int $maxLength, string $errorMessage = null): self
     {
         if ($errorMessage === null) {
             $errorMessage = sprintf(__('ivopetkov.form.The length of this field must be atmost %s characters.'), $maxLength);
@@ -76,9 +76,9 @@ class Constraints
      * 
      * @param string $elementName The element name
      * @param string $errorMessage Error message
-     * @return \IvoPetkov\BearFrameworkAddons\Form\Constraints Returns a reference to itself.
+     * @return self Returns a reference to itself.
      */
-    public function setEmail(string $elementName, string $errorMessage = null): \IvoPetkov\BearFrameworkAddons\Form\Constraints
+    public function setEmail(string $elementName, string $errorMessage = null): self
     {
         if ($errorMessage === null) {
             $errorMessage = __('ivopetkov.form.This is not a valid email address.');
@@ -92,9 +92,9 @@ class Constraints
      * 
      * @param string $elementName The element name
      * @param string $errorMessage Error message
-     * @return \IvoPetkov\BearFrameworkAddons\Form\Constraints Returns a reference to itself.
+     * @return self Returns a reference to itself.
      */
-    public function setPhone(string $elementName, string $errorMessage = null): \IvoPetkov\BearFrameworkAddons\Form\Constraints
+    public function setPhone(string $elementName, string $errorMessage = null): self
     {
         if ($errorMessage === null) {
             $errorMessage = __('ivopetkov.form.This is not a valid phone number.');
@@ -109,9 +109,9 @@ class Constraints
      * @param string $elementName The element name
      * @param string $regularExpression
      * @param string $errorMessage Error message
-     * @return \IvoPetkov\BearFrameworkAddons\Form\Constraints Returns a reference to itself.
+     * @return self Returns a reference to itself.
      */
-    public function setRegularExpression(string $elementName, string $regularExpression, string $errorMessage = null): \IvoPetkov\BearFrameworkAddons\Form\Constraints
+    public function setRegularExpression(string $elementName, string $regularExpression, string $errorMessage = null): self
     {
         if ($errorMessage === null) {
             $errorMessage = __('ivopetkov.form.This is not a valid value.');
