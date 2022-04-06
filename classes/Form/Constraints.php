@@ -121,6 +121,23 @@ class Constraints
     }
 
     /**
+     * Add custom validator
+     * 
+     * @param string $elementName The element name
+     * @param callable $callback
+     * @param string $errorMessage Error message
+     * @return self Returns a reference to itself.
+     */
+    public function setValidator(string $elementName, callable $callback, string $errorMessage = null): self
+    {
+        if ($errorMessage === null) {
+            $errorMessage = __('ivopetkov.form.This is not a valid value.');
+        }
+        $this->data[] = ['validator', $errorMessage, $elementName, $callback];
+        return $this;
+    }
+
+    /**
      * Validates the values passed
      * 
      * @param array $values The values to checks
@@ -168,6 +185,10 @@ class Constraints
                 }
             } elseif ($type === 'regExp') {
                 if (filter_var($value, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => $item[3]]]) === false) {
+                    $hasError = true;
+                }
+            } elseif ($type === 'validator') {
+                if (call_user_func($item[3], $value) !== true) {
                     $hasError = true;
                 }
             }
