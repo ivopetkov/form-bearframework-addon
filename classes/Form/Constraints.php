@@ -181,6 +181,20 @@ class Constraints
                 if ($valueLength > 0) {
                     if ($valueLength > 30 || $valueLength < 3 || filter_var($value, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => '/^[+]?[0-9 \-]*$/']]) === false) {
                         $hasError = true;
+                    } else {
+                        $valueNoWhiteSpace = preg_replace('/\s/', '', $value);
+                        $valueNoWhiteSpaceLength = strlen($valueNoWhiteSpace);
+                        $first3chars = substr($valueNoWhiteSpace, 0, 3);
+                        $first6chars = substr($valueNoWhiteSpace, 0, 6);
+                        if ($first3chars === '087' || $first3chars === '088' || $first3chars === '089') { // Mobile in Bulgaria without country code
+                            if ($valueNoWhiteSpaceLength !== strlen('0888999888')) {
+                                $hasError = true;
+                            }
+                        } elseif ($first6chars === '+35987' || $first6chars === '+35988' || $first6chars === '+35989') { // Mobile in Bulgaria without country code
+                            if ($valueNoWhiteSpaceLength !== strlen('+359888999888')) {
+                                $hasError = true;
+                            }
+                        }
                     }
                 }
             } elseif ($type === 'regExp') {
