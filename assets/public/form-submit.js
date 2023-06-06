@@ -60,7 +60,6 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
             var data = {};
             data['serverData'] = formData.serverData;
             data['values'] = JSON.stringify(values);
-
             clientPackages.get('serverRequests').then(function (serverRequests) {
                 serverRequests.send('ivopetkov-form', data)
                     .then(async (responseText) => {
@@ -97,19 +96,48 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
                         showFormError(formData.errorMessage);
                     });
             });
-
         };
 
-        var pendingUploads = {};
+        var uploadFile = function (file, onSuccess, onAbort, onFail, onProgress) {
+            var request = new XMLHttpRequest();
+            request.addEventListener("load", function () {
+                if (request.status === 200 && request.responseText.indexOf('"filename":') > 0) {
+                    onSuccess(JSON.parse(request.responseText));
+                    return;
+                }
+                onFail();
+            });
+            request.addEventListener("error", function () {
+                onFail();
+            });
+            request.addEventListener("abort", function () {
+                onAbort();
+            });
+            request.addEventListener("timeout", function () {
+                onFail();
+            });
+            request.upload.addEventListener("loadstart", function () {
+                onProgress(0);
+            });
+            request.upload.addEventListener("loadend", function () {
+                onProgress(100);
+            });
+            request.upload.addEventListener("progress", function (event) {
+                var percent = typeof event.lengthComputable !== 'undefined' && event.lengthComputable ? Math.round(event.loaded / event.total * 100) : 0;
+                onProgress(percent);
+            });
+            var formData = new FormData();
+            formData.append("file", file);
+            request.open('POST', formSubmitData.filesUploadUrl, true);
+            request.send(formData);
+        };
+
+        var pendingFileUploads = {};
         var hasPendingUploads = false;
-        var onFileUploaded = function (elementName, fileData) {
-            pendingUploads[elementName] = 1;
-            values[elementName] = {
-                'type': 'file',
-                'value': fileData
-            };
-            for (var k in pendingUploads) {
-                if (pendingUploads[k] === null) {
+
+        var continueIfAllFilesUploaded = function () {
+            for (var k in pendingFileUploads) {
+                if (pendingFileUploads[k] > 0) {
                     return;
                 }
             }
@@ -127,54 +155,110 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
                     elementType = 'text';
                 }
                 if (elementType === 'file') {
-                    if (typeof element.files !== 'undefined' && element.files.length > 0) {
-                        (function (elementName) {
-                            pendingUploads[elementName] = null;
-                            var request = new XMLHttpRequest();
-                            request.addEventListener("load", function () {
-                                if (request.status === 200) {
-                                    if (request.responseText.indexOf('"filename":') > 0) {
-                                        onFileUploaded(elementName, request.responseText);
+                    if (typeof element.getFormElementContainer !== 'undefined') { // ivopetkov/form-elements-bearframework-addon element
+                        var elementContainer = element.getFormElementContainer();
+                        (function (elementContainer, elementType, elementName) {
+                            var getFormElementContainerValue = function () {
+                                values[elementName] = {
+                                    'type': elementType,
+                                    'value': elementContainer.getValue()
+                                };
+                            };
+                            if (elementContainer.hasPendingUploads()) {
+                                pendingFileUploads[elementName] = 1;
+                                elementContainer.upload(
+                                    function (file, onSuccess, onAbort, onFail, onProgress) {
+                                        uploadFile(file, function (value) {
+                                            onSuccess(value);
+                                        }, onAbort, onFail, onProgress);
+                                    },
+                                    function () { // on success
+                                        pendingFileUploads[elementName] = 0;
+                                        getFormElementContainerValue();
+                                        continueIfAllFilesUploaded();
+                                    },
+                                    function () { // on abort
+
+                                    },
+                                    function () { // on fail
+                                        dispatchError();
+                                    },
+                                    function (progress) { // on progress
+                                    },
+                                );
+                                hasPendingUploads = true;
+                            }
+                            getFormElementContainerValue();
+                        })(elementContainer, elementType, elementName);
+                    } else { // default input field
+                        if (typeof element.files !== 'undefined' && element.files.length > 0) {
+                            (function (elementName, files) {
+                                var filesCount = files.length;
+                                pendingFileUploads[elementName] = filesCount;
+                                var uploadNextFile = function (index) {
+                                    if (typeof files[index] === 'undefined') {
                                         return;
                                     }
-                                }
-                                dispatchError();
-                            });
-                            request.addEventListener("error", function () {
-                                dispatchError();
-                            });
-                            request.addEventListener("abort", function () {
-                                dispatchError();
-                            });
-                            request.addEventListener("timeout", function () {
-                                dispatchError();
-                            });
-                            var filesData = new FormData();
-                            for (var i = 0; i < element.files.length; i++) {
-                                filesData.append("file" + i, element.files[i]);
-                            }
-                            request.open('POST', formSubmitData.filesUploadUrl, true);
-                            request.send(filesData);
-                            hasPendingUploads = true;
-                        })(elementName);
-                    } else {
-                        values[elementName] = {
-                            'type': elementType,
-                            'value': ''
-                        };
-                    }
-                } else if (elementType === 'checkbox' || elementType === 'radio') {
-                    if (element.checked) {
-                        values[elementName] = {
-                            'type': elementType,
-                            'value': element.value
-                        };
+                                    uploadFile(files[index],
+                                        function (value) { // on success
+                                            uploadNextFile(index + 1);
+                                            pendingFileUploads[elementName]--;
+                                            if (typeof values[elementName] === 'undefined') {
+                                                values[elementName] = {
+                                                    'type': 'file',
+                                                    'value': []
+                                                };
+                                            }
+                                            values[elementName].value.push(value);
+                                            if (pendingFileUploads[elementName] === 0) {
+                                                values[elementName].value = JSON.stringify(values[elementName].value);
+                                            }
+                                            continueIfAllFilesUploaded();
+                                        },
+                                        function () { // on abort
+
+                                        },
+                                        function () { // on fail
+                                            dispatchError();
+                                        },
+                                        function () { // on progress
+
+                                        },
+                                    );
+                                };
+                                uploadNextFile(0);
+                                hasPendingUploads = true;
+                            })(elementName, element.files);
+                        } else {
+                            values[elementName] = {
+                                'type': elementType,
+                                'value': ''
+                            };
+                        }
                     }
                 } else {
-                    values[elementName] = {
-                        'type': elementType,
-                        'value': element.value
-                    };
+                    if (typeof element.getFormElementContainer !== 'undefined') { // ivopetkov/form-elements-bearframework-addon element
+                        var elementContainer = element.getFormElementContainer();
+                        values[elementName] = {
+                            'type': elementType,
+                            'value': elementContainer.getValue()
+                        };
+                    } else {
+                        var elementValue = element.value;
+                        if (elementType === 'checkbox' || elementType === 'radio') {
+                            if (element.checked) {
+                                values[elementName] = {
+                                    'type': elementType,
+                                    'value': elementValue
+                                };
+                            }
+                        } else {
+                            values[elementName] = {
+                                'type': elementType,
+                                'value': elementValue
+                            };
+                        }
+                    }
                 }
             }
         }

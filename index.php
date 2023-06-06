@@ -37,29 +37,24 @@ $app->components
 $app->routes
     ->add('POST /-ivopetkov-form-files-upload/', function () use ($app) {
         $response = [];
-        for ($i = 0; $i < 100000; $i++) {
-            $fileItem = $app->request->formData->getFile('file' . $i);
-            if ($fileItem === null) {
-                break;
-            }
-            if (is_file($fileItem->filename)) {
-                $filename = md5(uniqid() . $fileItem->filename) . '.tmp';
-                $newFilepath = $app->data->getFilename('.temp/form/files/' . $filename);
-                $pathInfo = pathinfo($newFilepath);
-                if (isset($pathInfo['dirname'])) {
-                    if (!is_dir($pathInfo['dirname'])) {
-                        mkdir($pathInfo['dirname'], 0777, true);
-                    }
+        $fileItem = $app->request->formData->getFile('file');
+        if ($fileItem !== null && is_file($fileItem->filename)) {
+            $filename = md5(uniqid() . $fileItem->filename) . '.tmp';
+            $newFilepath = $app->data->getFilename('.temp/form/files/' . $filename);
+            $pathInfo = pathinfo($newFilepath);
+            if (isset($pathInfo['dirname'])) {
+                if (!is_dir($pathInfo['dirname'])) {
+                    mkdir($pathInfo['dirname'], 0777, true);
                 }
-                copy($fileItem->filename, $newFilepath); // rename() - Cannot rename a file across wrapper types
-                unlink($fileItem->filename);
-                $response[] = [
-                    'value' => $fileItem->value,
-                    'filename' => $filename,
-                    'size' => $fileItem->size,
-                    'type' => $fileItem->type
-                ];
             }
+            copy($fileItem->filename, $newFilepath); // rename() - Cannot rename a file across wrapper types
+            unlink($fileItem->filename);
+            $response = [
+                'value' => $fileItem->value,
+                'filename' => $filename,
+                'size' => $fileItem->size,
+                'type' => $fileItem->type
+            ];
         }
         return new App\Response\JSON(json_encode($response));
     });
@@ -102,8 +97,8 @@ $app->serverRequests
                                             $values[$tempValueName] = json_encode($filesData);
                                         }
                                     }
-                                    if (!isset($values[$tempValueName])) {
-                                        $values[$tempValueName] = '';
+                                    if (!isset($values[$tempValueName])) { // old value
+                                        $values[$tempValueName] = $tempValueData['value'];
                                     }
                                 } else {
                                     $values[$tempValueName] = $tempValueData['value'];
@@ -164,7 +159,7 @@ $app->clientPackages
     })
     ->add('-form-submit', function (IvoPetkov\BearFrameworkAddons\ClientPackage $package) use ($app, $context) {
         //$package->addJSCode(file_get_contents($context->dir . '/assets/public/form-submit.js'));
-        $package->addJSFile($context->assets->getURL('assets/public/form-submit.min.js', ['cacheMaxAge' => 999999999, 'version' => 11, 'robotsNoIndex' => true]));
+        $package->addJSFile($context->assets->getURL('assets/public/form-submit.min.js', ['cacheMaxAge' => 999999999, 'version' => 12, 'robotsNoIndex' => true]));
 
         $style = '[data-form-component="tooltip"]{--form-tooltip-background-color:#111;--form-tooltip-arrow-size:8px;display:inline-block;background:var(--form-tooltip-background-color);border-radius:2px;font-family:Arial;font-size:14px;color:#fff;padding:13px 15px;position:absolute;z-index:10030000;max-width:220px;user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none;cursor:default;text-align:center;}';
         $style .= '[data-form-component="tooltip"]:before{border:solid;border-color:var(--form-tooltip-background-color) transparent;border-width:var(--form-tooltip-arrow-size) var(--form-tooltip-arrow-size) 0 var(--form-tooltip-arrow-size);bottom:calc(0px - var(--form-tooltip-arrow-size));content:"";left:calc(50% - var(--form-tooltip-arrow-size));position:absolute;}';
