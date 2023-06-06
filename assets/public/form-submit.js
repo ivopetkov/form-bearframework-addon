@@ -239,10 +239,13 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
                 } else {
                     if (typeof element.getFormElementContainer !== 'undefined') { // ivopetkov/form-elements-bearframework-addon element
                         var elementContainer = element.getFormElementContainer();
-                        values[elementName] = {
-                            'type': elementType,
-                            'value': elementContainer.getValue()
-                        };
+                        var elementValue = elementContainer.getValue();
+                        if (elementValue !== null) { // dont send if checkbox or radio, all others should return empty strings
+                            values[elementName] = {
+                                'type': elementType,
+                                'value': elementValue
+                            };
+                        }
                     } else {
                         var elementValue = element.value;
                         if (elementType === 'checkbox' || elementType === 'radio') {
