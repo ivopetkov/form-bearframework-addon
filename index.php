@@ -159,7 +159,7 @@ $app->clientPackages
     })
     ->add('-form-submit', function (IvoPetkov\BearFrameworkAddons\ClientPackage $package) use ($app, $context) {
         //$package->addJSCode(file_get_contents($context->dir . '/assets/public/form-submit.js'));
-        $package->addJSFile($context->assets->getURL('assets/public/form-submit.min.js', ['cacheMaxAge' => 999999999, 'version' => 13, 'robotsNoIndex' => true]));
+        $package->addJSFile($context->assets->getURL('assets/public/form-submit.min.js', ['cacheMaxAge' => 999999999, 'version' => 14, 'robotsNoIndex' => true]));
 
         $style = '[data-form-component="tooltip"]{--form-tooltip-background-color:#111;--form-tooltip-arrow-size:8px;display:inline-block;background:var(--form-tooltip-background-color);border-radius:2px;font-family:Arial;font-size:14px;color:#fff;padding:13px 15px;position:absolute;z-index:10030000;max-width:220px;user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none;cursor:default;text-align:center;}';
         $style .= '[data-form-component="tooltip"]:before{border:solid;border-color:var(--form-tooltip-background-color) transparent;border-width:var(--form-tooltip-arrow-size) var(--form-tooltip-arrow-size) 0 var(--form-tooltip-arrow-size);bottom:calc(0px - var(--form-tooltip-arrow-size));content:"";left:calc(50% - var(--form-tooltip-arrow-size));position:absolute;}';

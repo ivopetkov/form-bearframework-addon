@@ -34,7 +34,7 @@ $encryptedServerData = md5($serverData) . base64_encode($app->encryption->encryp
 $initializeData = [
     $id,
     $encryptedServerData,
-    __('ivopetkov.form.Error occurred. Please, try again later.'),
+    __('ivopetkov.form.error'),
     $form->dependencies->getClientData()
 ];
 

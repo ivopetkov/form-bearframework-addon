@@ -31,9 +31,62 @@ class Constraints
     public function setRequired(string $elementName, string $errorMessage = null): self
     {
         if ($errorMessage === null) {
-            $errorMessage = __('ivopetkov.form.This field is required.');
+            $errorMessage = __('ivopetkov.form.constraint.required');
         }
         $this->data[] = ['required', $errorMessage, $elementName];
+        return $this;
+    }
+
+    /**
+     * Sets a numeric requirement for an element
+     * 
+     * @param string $elementName The element name
+     * @param int $decimalsCount
+     * @param string $errorMessage Error message
+     * @return self Returns a reference to itself.
+     */
+    public function setNumeric(string $elementName, int $decimalsCount = 0, string $errorMessage = null): self
+    {
+        if ($errorMessage === null) {
+            if ($decimalsCount > 0) {
+                $errorMessage = sprintf(__('ivopetkov.form.constraint.numericFloat'), $decimalsCount);
+            } else {
+                $errorMessage = __('ivopetkov.form.constraint.numeric');
+            }
+        }
+        $this->data[] = ['numeric', $errorMessage, $elementName, $decimalsCount];
+        return $this;
+    }
+
+    /**
+     * 
+     * @param string $elementName
+     * @param integer $value
+     * @param string|null $errorMessage
+     * @return self
+     */
+    public function setMinNumber(string $elementName, float $value = 0, string $errorMessage = null): self
+    {
+        if ($errorMessage === null) {
+            $errorMessage = sprintf(__('ivopetkov.form.constraint.minNumber'), $value);
+        }
+        $this->data[] = ['minNumber', $errorMessage, $elementName, $value];
+        return $this;
+    }
+
+    /**
+     * 
+     * @param string $elementName
+     * @param integer $value
+     * @param string|null $errorMessage
+     * @return self
+     */
+    public function setMaxNumber(string $elementName, float $value = 0, string $errorMessage = null): self
+    {
+        if ($errorMessage === null) {
+            $errorMessage = sprintf(__('ivopetkov.form.constraint.maxNumber'), $value);
+        }
+        $this->data[] = ['maxNumber', $errorMessage, $elementName, $value];
         return $this;
     }
 
@@ -48,7 +101,7 @@ class Constraints
     public function setMinLength(string $elementName, int $minLength, string $errorMessage = null): self
     {
         if ($errorMessage === null) {
-            $errorMessage = sprintf(__('ivopetkov.form.The length of this field must be atleast %s characters.'), $minLength);
+            $errorMessage = sprintf(__('ivopetkov.form.constraint.minLength'), $minLength);
         }
         $this->data[] = ['minLength', $errorMessage, $elementName, $minLength];
         return $this;
@@ -65,7 +118,7 @@ class Constraints
     public function setMaxLength(string $elementName, int $maxLength, string $errorMessage = null): self
     {
         if ($errorMessage === null) {
-            $errorMessage = sprintf(__('ivopetkov.form.The length of this field must be atmost %s characters.'), $maxLength);
+            $errorMessage = sprintf(__('ivopetkov.form.constraint.maxLength'), $maxLength);
         }
         $this->data[] = ['maxLength', $errorMessage, $elementName, $maxLength];
         return $this;
@@ -81,7 +134,7 @@ class Constraints
     public function setEmail(string $elementName, string $errorMessage = null): self
     {
         if ($errorMessage === null) {
-            $errorMessage = __('ivopetkov.form.This is not a valid email address.');
+            $errorMessage = __('ivopetkov.form.constraint.email');
         }
         $this->data[] = ['email', $errorMessage, $elementName];
         return $this;
@@ -97,7 +150,7 @@ class Constraints
     public function setPhone(string $elementName, string $errorMessage = null): self
     {
         if ($errorMessage === null) {
-            $errorMessage = __('ivopetkov.form.This is not a valid phone number.');
+            $errorMessage = __('ivopetkov.form.constraint.phone');
         }
         $this->data[] = ['phone', $errorMessage, $elementName];
         return $this;
@@ -114,7 +167,7 @@ class Constraints
     public function setRegularExpression(string $elementName, string $regularExpression, string $errorMessage = null): self
     {
         if ($errorMessage === null) {
-            $errorMessage = __('ivopetkov.form.This is not a valid value.');
+            $errorMessage = __('ivopetkov.form.invalid');
         }
         $this->data[] = ['regExp', $errorMessage, $elementName, $regularExpression];
         return $this;
@@ -131,7 +184,7 @@ class Constraints
     public function setValidator(string $elementName, callable $callback, string $errorMessage = null): self
     {
         if ($errorMessage === null) {
-            $errorMessage = __('ivopetkov.form.This is not a valid value.');
+            $errorMessage = __('ivopetkov.form.invalid');
         }
         $this->data[] = ['validator', $errorMessage, $elementName, $callback];
         return $this;
@@ -161,12 +214,29 @@ class Constraints
                 if (strlen($value) === 0) {
                     $hasError = true;
                 }
+            } elseif ($type === 'numeric') {
+                if (!is_numeric($value)) {
+                    $hasError = true;
+                } else {
+                    $parts = explode('.', str_replace(',', '.', $value));
+                    if (isset($parts[1]) && strlen($parts[1]) > $item[3]) {
+                        $hasError = true;
+                    }
+                }
+            } elseif ($type === 'minNumber') {
+                if ((float)$value < $item[3]) {
+                    $hasError = true;
+                }
+            } elseif ($type === 'maxNumber') {
+                if ((float)$value > $item[3]) {
+                    $hasError = true;
+                }
             } elseif ($type === 'minLength') {
-                if (strlen($value) < $item[3]) {
+                if (mb_strlen($value) < $item[3]) {
                     $hasError = true;
                 }
             } elseif ($type === 'maxLength') {
-                if (strlen($value) > $item[3]) {
+                if (mb_strlen($value) > $item[3]) {
                     $hasError = true;
                 }
             } elseif ($type === 'email') {

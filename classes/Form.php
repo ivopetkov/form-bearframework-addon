@@ -50,7 +50,7 @@ class Form
     public function throwError(string $message = null): void
     {
         $exception = new Form\Internal\ErrorException('');
-        $exception->errorMessage = $message !== null ? $message : __('ivopetkov.form.Error occurred. Please, try again later.');
+        $exception->errorMessage = $message !== null ? $message : __('ivopetkov.form.error');
         throw $exception;
     }
 
@@ -64,7 +64,7 @@ class Form
     {
         $exception = new Form\Internal\ErrorException('');
         $exception->elementName = $elementName;
-        $exception->errorMessage = $message !== null ? $message : __('ivopetkov.form.Error occurred. Please, try again later.');
+        $exception->errorMessage = $message !== null ? $message : __('ivopetkov.form.error');
         throw $exception;
     }
 }

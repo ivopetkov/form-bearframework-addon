@@ -20,9 +20,12 @@ ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (func
         return null;
     };
 
-    var makeEvent = function (name) {
+    var makeEvent = function (name, cancelable) {
+        if (typeof cancelable === 'undefined') {
+            cancelable = false;
+        }
         if (typeof Event === 'function') {
-            return new Event(name);
+            return new Event(name, { cancelable: cancelable });
         } else {
             var event = document.createEvent('Event');
             event.initEvent(name, false, false);
@@ -229,8 +232,8 @@ ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (func
                 return;
             }
 
-            var dispatchEvent = async (name, data) => {
-                var event = makeEvent(name);
+            var dispatchEvent = async (name, data, cancelable) => {
+                var event = makeEvent(name, cancelable);
                 if (typeof data !== 'undefined') {
                     for (var key in data) {
                         event[key] = data[key];
@@ -249,10 +252,10 @@ ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (func
                 if (updateDisabled) {
                     formElement.setAttribute('disabled', 'true');
                 }
-                return result;
+                return result; // false if preventDefault() called.
             };
 
-            var result = await dispatchEvent('beforesubmit');
+            var result = await dispatchEvent('beforesubmit', {}, true);
             if (!result) {
                 return;
             }
