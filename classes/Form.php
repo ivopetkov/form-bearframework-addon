@@ -17,9 +17,15 @@ class Form
 
     /**
      *
-     * @var string 
+     * @var callable|null 
      */
     public $onSubmit = null;
+
+    /**
+     *
+     * @var callable|null 
+     */
+    public $onError = null;
 
     /**
      *

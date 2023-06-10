@@ -112,13 +112,23 @@ $app->serverRequests
                         $values[$hiddenElement] = '';
                     }
 
+                    $callOnError = function (string $message, string $element) use ($form, $values) {
+                        if (is_callable($form->onError)) {
+                            $closure = \Closure::bind($form->onError, $form);
+                            call_user_func($closure, $message, $element, isset($values[$element]) ? $values[$element] : null);
+                        }
+                    };
+
                     $errorsList = [];
                     if (!$form->constraints->validate($values, $errorsList, $hiddenElements)) {
+                        $errorMessage = (string) $errorsList[0]['errorMessage'];
+                        $errorElementName = (string) $errorsList[0]['elementName'];
+                        $callOnError($errorMessage, $errorElementName);
                         return json_encode([
                             'status' => '0',
                             'error' => [
-                                'message' => (string) $errorsList[0]['errorMessage'],
-                                'element' => (string) $errorsList[0]['elementName'],
+                                'message' => $errorMessage,
+                                'element' => $errorElementName,
                             ]
                         ]);
                     }
@@ -127,11 +137,14 @@ $app->serverRequests
                         $closure = \Closure::bind($form->onSubmit, $form);
                         $returnValue = call_user_func($closure, new ArrayObject($values), $response);
                     } catch (Form\Internal\ErrorException $e) {
+                        $errorMessage = (string) $e->errorMessage;
+                        $errorElementName = (string) $e->elementName;
+                        $callOnError($errorMessage, $errorElementName);
                         return json_encode([
                             'status' => '0',
                             'error' => [
-                                'message' => (string) $e->errorMessage,
-                                'element' => (string) $e->elementName,
+                                'message' => $errorMessage,
+                                'element' => $errorElementName,
                             ]
                         ]);
                     }
