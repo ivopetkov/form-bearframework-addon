@@ -42,11 +42,14 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
             await dispatchEnd();
         };
 
-        var dispatchError = async (reason) => {
-            if (typeof reason === 'undefined') {
-                reason = 'unknown';
+        var dispatchError = async (message, element) => {
+            if (typeof message === 'undefined') {
+                message = '';
             }
-            var result = await dispatchEvent('submiterror', { reason: reason }, true);
+            if (typeof element === 'undefined') {
+                element = '';
+            }
+            var result = await dispatchEvent('submiterror', { errorMessage: message, errorElement: element }, true);
             await dispatchEnd();
             return result; // false if preventDefault() called.
         };
@@ -74,19 +77,21 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
                         }
                         if (typeof response.status !== 'undefined') {
                             if (response.status === '0') {
-                                var errorEventResult = await dispatchError('constraints');
+                                var errorElement = typeof response.error.element !== 'undefined' && response.error.element.length > 0 ? response.error.element : null;
+                                var errorMessage = typeof response.error.message !== 'undefined' && response.error.message.length > 0 ? response.error.message : null;
+                                var errorEventResult = await dispatchError(errorMessage, errorElement);
                                 if (errorEventResult) { // not cancelled
-                                    if (typeof response.error.element !== 'undefined' && response.error.element.length > 0) {
-                                        var invalidElement = formElement.querySelector('[name="' + response.error.element + '"]');
+                                    if (errorElement !== null) {
+                                        var invalidElement = formElement.querySelector('[name="' + errorElement + '"]');
                                         if (invalidElement !== null) {
                                             invalidElement.focus();
                                         }
                                     }
-                                    if (typeof response.error.message !== 'undefined' && response.error.message.length > 0) {
-                                        if (typeof response.error.element !== 'undefined' && response.error.element.length > 0 && invalidElement !== null) {
-                                            createTooltip(invalidElement, response.error.message);
+                                    if (errorMessage !== null) {
+                                        if (errorElement !== null && invalidElement !== null) {
+                                            createTooltip(invalidElement, errorMessage);
                                         } else {
-                                            showFormError(response.error.message);
+                                            showFormError(errorMessage);
                                         }
                                     }
                                 }
@@ -94,11 +99,11 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
                                 await dispatchSuccess(response.result);
                             }
                         } else {
-                            await dispatchError();
+                            await dispatchError(formData.errorMessage);
                         }
                     })
                     .catch(async () => {
-                        var errorEventResult = await dispatchError();
+                        var errorEventResult = await dispatchError(formData.errorMessage);
                         if (errorEventResult) { // not cancelled
                             showFormError(formData.errorMessage);
                         }
