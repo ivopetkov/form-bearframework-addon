@@ -119,6 +119,8 @@ $app->serverRequests
                         }
                     };
 
+                    $values = $form->transformers->apply($values);
+
                     $errorsList = [];
                     if (!$form->constraints->validate($values, $errorsList, $hiddenElements)) {
                         $errorMessage = (string) $errorsList[0]['errorMessage'];

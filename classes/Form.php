@@ -40,12 +40,19 @@ class Form
     public $dependencies;
 
     /**
+     *
+     * @var \IvoPetkov\BearFrameworkAddons\Form\Transformers
+     */
+    public $transformers;
+
+    /**
      * 
      */
     function __construct()
     {
         $this->constraints = new Form\Constraints();
         $this->dependencies = new Form\Dependencies();
+        $this->transformers = new Form\Transformers();
     }
 
     /**
