@@ -165,20 +165,19 @@ $app->clientPackages
         //$code = file_get_contents($context->dir . '/dev/form.js');
         $package->addJSCode($code);
 
+        $package->embedPackage('tooltip');
+
         $code = 'form[data-form-id][disabled]{position:relative;}'
             . 'form[data-form-id][disabled],form[data-form-id][disabled] input, form[data-form-id][disabled] select,form[data-form-id][disabled] textarea{user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none;pointer-events:none;}'
-            . 'form[data-form-id][disabled]:before{content:"";display:block;position:absolute;width:100%;height:100%;}';
+            . 'form[data-form-id][disabled]:before{content:"";display:block;position:absolute;width:100%;height:100%;}'
+            . '[data-form-component="tooltip"]{--form-tooltip-background-color:#111;--form-tooltip-arrow-size:8px;--form-tooltip-content-spacing:12px;--form-tooltip-max-width:350px;word-break:break-word;border-radius:2px;font-family:Arial;font-size:14px;color:#fff;padding:13px 15px;user-select:none;cursor:default;text-align:center;--tooltip-background-color:var(--form-tooltip-background-color);--tooltip-arrow-size:var(--form-tooltip-arrow-size);--tooltip-content-spacing:var(--form-tooltip-content-spacing);--tooltip-max-width:var(--form-tooltip-max-width);}';
         $package->addCSSCode($code);
 
         $package->get = 'return ivoPetkov.bearFrameworkAddons.form;';
     })
     ->add('-form-submit', function (IvoPetkov\BearFrameworkAddons\ClientPackage $package) use ($app, $context) {
         //$package->addJSCode(file_get_contents($context->dir . '/assets/public/form-submit.js'));
-        $package->addJSFile($context->assets->getURL('assets/public/form-submit.min.js', ['cacheMaxAge' => 999999999, 'version' => 15, 'robotsNoIndex' => true]));
-
-        $style = '[data-form-component="tooltip"]{--form-tooltip-background-color:#111;--form-tooltip-arrow-size:8px;display:inline-block;background:var(--form-tooltip-background-color);border-radius:2px;font-family:Arial;font-size:14px;color:#fff;padding:13px 15px;position:absolute;z-index:10030000;max-width:220px;user-select:none;-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-o-user-select:none;cursor:default;text-align:center;}';
-        $style .= '[data-form-component="tooltip"]:before{border:solid;border-color:var(--form-tooltip-background-color) transparent;border-width:var(--form-tooltip-arrow-size) var(--form-tooltip-arrow-size) 0 var(--form-tooltip-arrow-size);bottom:calc(0px - var(--form-tooltip-arrow-size));content:"";left:calc(50% - var(--form-tooltip-arrow-size));position:absolute;}';
-        $package->addCSSCode($style);
+        $package->addJSFile($context->assets->getURL('assets/public/form-submit.min.js', ['cacheMaxAge' => 999999999, 'version' => 16, 'robotsNoIndex' => true]));
 
         $initializeData = [
             $app->urls->get('/-ivopetkov-form-files-upload/')

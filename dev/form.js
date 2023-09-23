@@ -298,9 +298,32 @@ ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (func
         }
     };
 
+    var isElementOutsideViewport = function (element) {
+        var rect = element.getBoundingClientRect();
+        return rect.bottom < 0 || rect.right < 0 || rect.left > window.innerWidth || rect.top > window.innerHeight;
+    };
+
+    var showTooltip = function (target, text) {
+        if (isElementOutsideViewport(target)) {
+            target.scrollIntoView();
+        }
+        clientPackages.get('tooltip').then(function (tooltip) {
+            tooltip.show('ip-form-tooltip', target, '', {
+                preferedPositions: ['top', 'bottom', 'right', 'left'],
+                hideOnClick: true,
+                hideOnKeyDown: true,
+                onBeforeShow: function (element) {
+                    element.setAttribute('data-form-component', 'tooltip');
+                    element.innerText = text;
+                }
+            });
+        });
+    };
+
     return {
         'initialize': initialize,
-        'submit': submit
+        'submit': submit,
+        'showTooltip': showTooltip
     };
 
 }());

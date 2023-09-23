@@ -14,5 +14,6 @@ BearFramework\Addons::register('ivopetkov/form-bearframework-addon', __DIR__, [
         'ivopetkov/server-requests-bearframework-addon',
         'ivopetkov/encryption-bearframework-addon',
         'ivopetkov/client-packages-bearframework-addon',
+        'ivopetkov/tooltip-js-bearframework-addon'
     ]
 ]);

@@ -23,7 +23,8 @@
         "ivopetkov/server-requests-bearframework-addon": "1.*",
         "ivopetkov/encryption-bearframework-addon": "1.*",
         "ivopetkov/html5-dom-document-php": "2.*",
-        "ivopetkov/client-packages-bearframework-addon": "1.*"
+        "ivopetkov/client-packages-bearframework-addon": "1.*",
+        "ivopetkov/tooltip-js-bearframework-addon": "1.*"
     },
     "require-dev": {
         "bearframework/addon-tests": "1.*"

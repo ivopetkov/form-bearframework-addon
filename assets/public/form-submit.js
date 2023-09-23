@@ -21,16 +21,8 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
         }
     };
 
-    var tooltipsToHide = [];
-
     var submit = (formElement, formData, dispatchEvent, onEnd) => {
         var values = {};
-
-        // Clear previous tooltips when submiting with Enter key
-        for (var i = 0; i < tooltipsToHide.length; i++) {
-            tooltipsToHide[i]();
-        }
-        tooltipsToHide = [];
 
         var dispatchEnd = async () => {
             await dispatchEvent('submitend');
@@ -284,39 +276,6 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
 
     };
 
-    var getElementSize = function (element) {
-        var rectangle = element.getBoundingClientRect();
-        return [rectangle.width, rectangle.height];
-    };
-
-    var getTooltipFixedContainer = function (element) {
-        while (element.parentNode && typeof element.parentNode.tagName !== "undefined") {
-            var style = window.getComputedStyle(element, null);
-            if (style === null) {
-                return null;
-            }
-            if (style.position === "fixed" && element.getAttribute('data-form-tooltip-container') !== null) {
-                return element;
-            }
-            element = element.parentNode;
-        }
-        return null;
-    };
-
-    var hasFixedParent = function (element) {
-        while (element.parentNode && typeof element.parentNode.tagName !== "undefined") {
-            var style = window.getComputedStyle(element, null);
-            if (style === null) {
-                return false;
-            }
-            if (style.position === "fixed") {
-                return true;
-            }
-            element = element.parentNode;
-        }
-        return false;
-    };
-
     var getElementCoordinates = function (element) {
         var rectangle = element.getBoundingClientRect();
         var left = Math.round(rectangle.left);
@@ -325,11 +284,6 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
         top += window.pageYOffset;
         return [left, top];
     };
-
-    var isElementOutsideViewport = function (element) {
-        var rect = element.getBoundingClientRect();
-        return rect.bottom < 0 || rect.right < 0 || rect.left > window.innerWidth || rect.top > window.innerHeight;
-    }
 
     var createTooltip = function (target, text) {
         for (var i = 0; i < 1000; i++) {
@@ -343,62 +297,9 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
         if (target === null || typeof target.tagName === 'undefined') {
             return;
         }
-
-        var element = document.createElement('a');
-        element.setAttribute('data-form-component', 'tooltip');
-        element.innerText = text;
-        element.style.left = '-1000px';
-        element.style.top = '-1000px';
-        var fixedContainer = getTooltipFixedContainer(target);
-        var hasFixedContainer = fixedContainer !== null;
-        var targetHasFixedParent = !hasFixedContainer && hasFixedParent(target);
-        if (targetHasFixedParent) {
-            element.style.position = 'fixed';
-        }
-        if (hasFixedContainer) {
-            fixedContainer.appendChild(element);
-        } else {
-            document.body.appendChild(element);
-        }
-        var updatePosition = function () {
-            var targetCoordinates = getElementCoordinates(target);
-            var targetSize = getElementSize(target);
-            var tooltipSize = getElementSize(element);
-            var arrowSize = getComputedStyle(element).getPropertyValue('--form-tooltip-arrow-size');
-            var left = targetCoordinates[0] + (targetSize[0] - tooltipSize[0]) / 2;
-            if (left < 5) {
-                left = 5;
-            }
-            var top = targetCoordinates[1] - tooltipSize[1] - 2;
-            if (hasFixedContainer) {
-                var fixedContainerCoordinates = getElementCoordinates(fixedContainer);
-                left -= fixedContainerCoordinates[0] - fixedContainer.scrollLeft;
-                top -= fixedContainerCoordinates[1] - fixedContainer.scrollTop;
-            } else if (targetHasFixedParent) {
-                left -= window.pageXOffset;
-                top -= window.pageYOffset;
-            }
-            element.style.left = left + 'px';
-            element.style.top = 'calc(' + top + 'px - ' + arrowSize + ')';
-        };
-        updatePosition();
-        if (isElementOutsideViewport(element)) {
-            element.scrollIntoView();
-        }
-        var intervalID = window.setInterval(updatePosition, 100);
-        var hide = function () {
-            try {
-                element.parentNode.removeChild(element);
-            } catch (e) {
-
-            }
-            window.removeEventListener('click', hide);
-            window.removeEventListener('keydown', hide);
-            window.clearInterval(intervalID);
-        };
-        window.addEventListener('click', hide);
-        window.addEventListener('keydown', hide);
-        tooltipsToHide.push(hide);
+        clientPackages.get('form').then(function (form) {
+            form.showTooltip(target, text);
+        });
     };
 
     return {
