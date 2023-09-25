@@ -182,12 +182,15 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
                                         getFormElementContainerValue();
                                         continueIfAllFilesUploaded();
                                     },
-                                    function () { // on abort
+                                    function (errorMessage) { // on abort
 
                                     },
-                                    function () { // on fail
-                                        dispatchError();
-                                    },
+                                    (function (element) { // on fail
+                                        return function (errorMessage) {
+                                            dispatchError(errorMessage, element);
+                                            createTooltip(element, errorMessage);
+                                        };
+                                    })(element),
                                     function (progress) { // on progress
                                     },
                                 );
@@ -276,19 +279,10 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
 
     };
 
-    var getElementCoordinates = function (element) {
-        var rectangle = element.getBoundingClientRect();
-        var left = Math.round(rectangle.left);
-        var top = Math.round(rectangle.top);
-        left += window.pageXOffset;
-        top += window.pageYOffset;
-        return [left, top];
-    };
-
     var createTooltip = function (target, text) {
         for (var i = 0; i < 1000; i++) {
-            var targetCoordinates = getElementCoordinates(target);
-            if (targetCoordinates[0] === 0 && targetCoordinates[1] === 0) { // check may be hidden (radio box input for example)
+            var rectangle = target.getBoundingClientRect();
+            if (rectangle.width === 0 && rectangle.height === 0) { // check may be hidden (radio box input for example)
                 target = target.parentNode;
             } else {
                 break;
