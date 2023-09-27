@@ -239,18 +239,10 @@ ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (func
                         event[key] = data[key];
                     }
                 }
-                var updateDisabled = false;
-                if (formElement.getAttribute('disabled') === 'true') {
-                    formElement.removeAttribute('disabled'); // The events does not work in IE 11 if disabled
-                    updateDisabled = true;
-                }
                 event.promisesToWait = [];
                 var result = formElement.dispatchEvent(event);
                 if (event.promisesToWait.length > 0) {
                     await Promise.allSettled(event.promisesToWait);
-                }
-                if (updateDisabled) {
-                    formElement.setAttribute('disabled', 'true');
                 }
                 return result; // false if preventDefault() called.
             };
@@ -277,23 +269,9 @@ ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (func
         var formElement = getFormElement(id);
         if (formElement !== null) {
             if (disable) {
-                formElement.setAttribute('disabled', 'true');
+                formElement.setAttribute('inert', 'true');
             } else {
-                formElement.removeAttribute('disabled');
-            }
-            var elements = formElement.querySelectorAll('input, select, textarea');
-            var elementsCount = elements.length;
-            for (var i = 0; i < elementsCount; i++) {
-                var element = elements[i];
-                if (disable) {
-                    element.setAttribute('disabled', 'true');
-                    element.ipfrmds = 1;
-                } else {
-                    if (typeof element.ipfrmds !== 'undefined') {
-                        element.removeAttribute('disabled');
-                        delete element.ipfrmds;
-                    }
-                }
+                formElement.removeAttribute('inert');
             }
         }
     };
