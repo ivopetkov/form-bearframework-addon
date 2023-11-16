@@ -35,6 +35,14 @@ $app->components
     ->addAlias('form', 'file:' . $context->dir . '/components/form.php');
 
 $app->routes
+    ->add('OPTIONS /-ivopetkov-form-files-upload/', function () {
+        $response = new App\Response();
+        $response->statusCode = 204;
+        $response->headers->set($response->headers->make('Access-Control-Allow-Origin', '*'));
+        $response->headers->set($response->headers->make('Access-Control-Allow-Methods', 'POST, OPTIONS'));
+        $response->headers->set($response->headers->make('Access-Control-Max-Age', '86400'));
+        return $response;
+    })
     ->add('POST /-ivopetkov-form-files-upload/', function () use ($app) {
         $response = [];
         $fileItem = $app->request->formData->getFile('file');
