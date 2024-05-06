@@ -21,86 +21,56 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
         }
     };
 
-    var submit = (formElement, formData, dispatchEvent, onEnd) => {
+    var submit = (formElement, formData, showFormError, showElementError, dispatchSuccess, dispatchError) => {
         var values = {};
-
-        var dispatchEnd = async () => {
-            await dispatchEvent('submitend');
-            await onEnd();
-        };
-
-        var dispatchSuccess = async (result) => {
-            await dispatchEvent('submitsuccess', { 'result': result });
-            await dispatchEnd();
-        };
-
-        var dispatchError = async (message, element) => {
-            if (typeof message === 'undefined') {
-                message = '';
-            }
-            if (typeof element === 'undefined') {
-                element = '';
-            }
-            var result = await dispatchEvent('submiterror', { errorMessage: message, errorElement: element }, true);
-            await dispatchEnd();
-            return result; // false if preventDefault() called.
-        };
-
-        var showFormError = function (message) {
-            var element = formElement.querySelector('[data-form-element-type="submit-button"]');
-            if (element !== null) {
-                createTooltip(element, message);
-            } else {
-                alert(message);
-            }
-        };
 
         var sendSubmitRequest = function () {
             var data = {};
             data['serverData'] = formData.serverData;
             data['values'] = JSON.stringify(values);
-            clientPackages.get('serverRequests').then(function (serverRequests) {
-                serverRequests.send('ivopetkov-form', data)
-                    .then(async (responseText) => {
-                        try {
-                            var response = JSON.parse(responseText);
-                        } catch (e) {
-                            var response = {};
-                        }
-                        if (typeof response.status !== 'undefined') {
-                            if (response.status === '0') {
-                                var errorElement = typeof response.error.element !== 'undefined' && response.error.element.length > 0 ? response.error.element : null;
-                                var errorMessage = typeof response.error.message !== 'undefined' && response.error.message.length > 0 ? response.error.message : null;
-                                var errorEventResult = await dispatchError(errorMessage, errorElement);
-                                if (errorEventResult) { // not cancelled
-                                    if (errorElement !== null) {
-                                        var invalidElement = formElement.querySelector('[name="' + errorElement + '"]');
-                                        if (invalidElement !== null) {
-                                            invalidElement.focus();
-                                        }
-                                    }
-                                    if (errorMessage !== null) {
-                                        if (errorElement !== null && invalidElement !== null) {
-                                            createTooltip(invalidElement, errorMessage);
-                                        } else {
-                                            showFormError(errorMessage);
-                                        }
-                                    }
-                                }
-                            } else if (response.status === '1') {
-                                await dispatchSuccess(response.result);
+            clientPackages.get('serverRequests')
+                .then(function (serverRequests) {
+                    serverRequests.send('ivopetkov-form', data)
+                        .then(async (responseText) => {
+                            try {
+                                var response = JSON.parse(responseText);
+                            } catch (e) {
+                                var response = {};
                             }
-                        } else {
-                            await dispatchError(formData.errorMessage);
-                        }
-                    })
-                    .catch(async () => {
-                        var errorEventResult = await dispatchError(formData.errorMessage);
-                        if (errorEventResult) { // not cancelled
-                            showFormError(formData.errorMessage);
-                        }
-                    });
-            });
+                            if (typeof response.status !== 'undefined') {
+                                if (response.status === '0') {
+                                    var errorElement = typeof response.error.element !== 'undefined' && response.error.element.length > 0 ? response.error.element : null;
+                                    var errorMessage = typeof response.error.message !== 'undefined' && response.error.message.length > 0 ? response.error.message : null;
+                                    var errorEventResult = await dispatchError(errorMessage, errorElement, false);
+                                    if (errorEventResult) { // not cancelled
+                                        if (errorElement !== null) {
+                                            var invalidElement = formElement.querySelector('[name="' + errorElement + '"]');
+                                            if (invalidElement !== null) {
+                                                invalidElement.focus();
+                                            }
+                                        }
+                                        if (errorMessage !== null) {
+                                            if (errorElement !== null && invalidElement !== null) {
+                                                showElementError(invalidElement, errorMessage);
+                                            } else {
+                                                showFormError(errorMessage);
+                                            }
+                                        }
+                                    }
+                                } else if (response.status === '1') {
+                                    await dispatchSuccess(response.result);
+                                }
+                            } else {
+                                await dispatchError(undefined, undefined, true);
+                            }
+                        })
+                        .catch(async () => {
+                            await dispatchError(undefined, undefined, true);
+                        });
+                })
+                .catch(async () => {
+                    await dispatchError(undefined, undefined, true);
+                });
         };
 
         var uploadFile = function (file, onSuccess, onAbort, onFail, onProgress) {
@@ -188,7 +158,7 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
                                     (function (element) { // on fail
                                         return function (errorMessage) {
                                             dispatchError(errorMessage, element);
-                                            createTooltip(element, errorMessage);
+                                            showElementError(element, errorMessage);
                                         };
                                     })(element),
                                     function (progress) { // on progress
@@ -277,23 +247,6 @@ ivoPetkov.bearFrameworkAddons.formSubmit = ivoPetkov.bearFrameworkAddons.formSub
             sendSubmitRequest();
         }
 
-    };
-
-    var createTooltip = function (target, text) {
-        for (var i = 0; i < 1000; i++) {
-            var rectangle = target.getBoundingClientRect();
-            if (rectangle.width === 0 && rectangle.height === 0) { // check may be hidden (radio box input for example)
-                target = target.parentNode;
-            } else {
-                break;
-            }
-        }
-        if (target === null || typeof target.tagName === 'undefined') {
-            return;
-        }
-        clientPackages.get('form').then(function (form) {
-            form.showTooltip(target, text);
-        });
     };
 
     return {

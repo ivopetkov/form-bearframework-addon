@@ -232,6 +232,22 @@ ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (func
                 return;
             }
 
+            var showFormError = function (message) {
+                if (typeof message === "undefined") {
+                    message = formData.errorMessage;
+                }
+                var element = formElement.querySelector('[data-form-element-type="submit-button"]');
+                if (element !== null) {
+                    showTooltip(element, message);
+                } else {
+                    alert(message);
+                }
+            };
+
+            var showElementError = function (element, message) {
+                showTooltip(element, message);
+            };
+
             var dispatchEvent = async (name, data, cancelable) => {
                 var event = makeEvent(name, cancelable);
                 if (typeof data !== 'undefined') {
@@ -256,11 +272,45 @@ ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (func
             disableOrEnable(id, true);
             await dispatchEvent('submitstart');
 
+            var onEndSubmit = function () {
+                formData.status = 0;
+                disableOrEnable(id, false);
+            };
+
+            var dispatchEnd = async () => {
+                await dispatchEvent('submitend');
+                onEndSubmit();
+            };
+
+            var dispatchSuccess = async (result) => {
+                await dispatchEvent('submitsuccess', { 'result': result });
+                await dispatchEnd();
+            };
+
+            var dispatchError = async (message, element, showError) => {
+                if (typeof message === 'undefined') {
+                    message = '';
+                }
+                if (typeof element === 'undefined') {
+                    element = '';
+                }
+                var result = await dispatchEvent('submiterror', { errorMessage: message, errorElement: element }, true);
+                await dispatchEnd();
+
+                if (showError && result) { // not cancelled
+                    showFormError();
+                }
+
+                return result; // false if preventDefault() called.
+            };
+
             clientPackages.get('-form-submit').then(function (formSubmit) {
-                formSubmit.submit(formElement, formData, dispatchEvent, () => {
-                    formData.status = 0;
-                    disableOrEnable(id, false);
-                });
+                formSubmit.submit(formElement, formData, showFormError, showElementError, dispatchSuccess, dispatchError);
+            }).catch(async () => {
+                var errorEventResult = await dispatchError();
+                if (errorEventResult) { // not cancelled
+                    showFormError();
+                }
             });
         }
     };
@@ -282,6 +332,17 @@ ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (func
     };
 
     var showTooltip = function (target, text) {
+        for (var i = 0; i < 1000; i++) {
+            var rectangle = target.getBoundingClientRect();
+            if (rectangle.width === 0 && rectangle.height === 0) { // check may be hidden (radio box input for example)
+                target = target.parentNode;
+            } else {
+                break;
+            }
+        }
+        if (target === null || typeof target.tagName === 'undefined') {
+            return;
+        }
         if (isElementOutsideViewport(target)) {
             target.scrollIntoView();
         }

@@ -185,7 +185,7 @@ $app->clientPackages
     })
     ->add('-form-submit', function (IvoPetkov\BearFrameworkAddons\ClientPackage $package) use ($app, $context) {
         //$package->addJSCode(file_get_contents($context->dir . '/assets/public/form-submit.js'));
-        $package->addJSFile($context->assets->getURL('assets/public/form-submit.min.js', ['cacheMaxAge' => 999999999, 'version' => 17, 'robotsNoIndex' => true]));
+        $package->addJSFile($context->assets->getURL('assets/public/form-submit.min.js', ['cacheMaxAge' => 999999999, 'version' => 18, 'robotsNoIndex' => true]));
 
         $initializeData = [
             $app->urls->get('/-ivopetkov-form-files-upload/')
