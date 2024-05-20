@@ -215,21 +215,30 @@ class Constraints
                     $hasError = true;
                 }
             } elseif ($type === 'numeric') {
-                if (!is_numeric($value)) {
-                    $hasError = true;
-                } else {
-                    $parts = explode('.', str_replace(',', '.', $value));
-                    if (isset($parts[1]) && strlen($parts[1]) > $item[3]) {
+                $valueLength = strlen($value);
+                if ($valueLength > 0) {
+                    if (!is_numeric($value)) {
                         $hasError = true;
+                    } else {
+                        $parts = explode('.', str_replace(',', '.', $value));
+                        if (isset($parts[1]) && strlen($parts[1]) > $item[3]) {
+                            $hasError = true;
+                        }
                     }
                 }
             } elseif ($type === 'minNumber') {
-                if ((float)$value < $item[3]) {
-                    $hasError = true;
+                $valueLength = strlen($value);
+                if ($valueLength > 0) {
+                    if ((float)$value < $item[3]) {
+                        $hasError = true;
+                    }
                 }
             } elseif ($type === 'maxNumber') {
-                if ((float)$value > $item[3]) {
-                    $hasError = true;
+                $valueLength = strlen($value);
+                if ($valueLength > 0) {
+                    if ((float)$value > $item[3]) {
+                        $hasError = true;
+                    }
                 }
             } elseif ($type === 'minLength') {
                 if (mb_strlen($value) < $item[3]) {
