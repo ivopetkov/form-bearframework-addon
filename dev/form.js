@@ -332,12 +332,46 @@ ivoPetkov.bearFrameworkAddons.form = ivoPetkov.bearFrameworkAddons.form || (func
     };
 
     var showTooltip = function (target, text) {
-        for (var i = 0; i < 1000; i++) {
-            var rectangle = target.getBoundingClientRect();
-            if (rectangle.width === 0 && rectangle.height === 0) { // check may be hidden (radio box input for example)
-                target = target.parentNode;
-            } else {
+        var elementIsVisible = function (element) {
+            var rectangle = element.getBoundingClientRect();
+            return rectangle.width > 0 || rectangle.height > 0;
+        };
+        for (var i = 0; i < 1000; i++) { // find visible element arount the target (if the target is not visible)
+            if (elementIsVisible(target)) {
                 break;
+            } else {
+                var newTargetFound = false;
+                var previousSibling = target.previousSibling;
+                for (var j = 0; j < 1000; j++) {
+                    if (previousSibling === null) {
+                        break;
+                    }
+                    if (elementIsVisible(previousSibling)) {
+                        target = previousSibling;
+                        newTargetFound = true;
+                        break;
+                    }
+                    previousSibling = previousSibling.previousSibling;
+                }
+                if (newTargetFound) {
+                    break;
+                }
+                var nextSibling = target.nextSibling;
+                for (var j = 0; j < 1000; j++) {
+                    if (nextSibling === null) {
+                        break;
+                    }
+                    if (elementIsVisible(nextSibling)) {
+                        target = nextSibling;
+                        newTargetFound = true;
+                        break;
+                    }
+                    nextSibling = nextSibling.nextSibling;
+                }
+                if (newTargetFound) {
+                    break;
+                }
+                target = target.parentNode;
             }
         }
         if (target === null || typeof target.tagName === 'undefined') {
