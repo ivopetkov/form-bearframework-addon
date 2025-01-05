@@ -60,7 +60,7 @@ class Form
      * @param string $message
      * @throws \IvoPetkov\BearFrameworkAddons\Form\Internal\ErrorException
      */
-    public function throwError(string $message = null): void
+    public function throwError(?string $message = null): void
     {
         $exception = new Form\Internal\ErrorException('');
         $exception->errorMessage = $message !== null ? $message : __('ivopetkov.form.error');
@@ -73,7 +73,7 @@ class Form
      * @param string $message
      * @throws \IvoPetkov\BearFrameworkAddons\Form\Internal\ErrorException
      */
-    public function throwElementError(string $elementName, string $message = null): void
+    public function throwElementError(string $elementName, ?string $message = null): void
     {
         $exception = new Form\Internal\ErrorException('');
         $exception->elementName = $elementName;

@@ -101,7 +101,7 @@ $app->serverRequests
                                                 $filesData[$i]['filename'] = $app->data->getFilename('.temp/form/files/' . $fileData['filename']);
                                             }
                                         }
-                                        if (sizeof($filesData) === $okCount) {
+                                        if (count($filesData) === $okCount) {
                                             $values[$tempValueName] = json_encode($filesData);
                                         }
                                     }
@@ -120,7 +120,7 @@ $app->serverRequests
                         $values[$hiddenElement] = '';
                     }
 
-                    $callOnError = function (string $message, string $element) use ($form, $values) {
+                    $callOnError = function (string $message, string $element) use ($form, $values): void {
                         if (is_callable($form->onError)) {
                             $closure = \Closure::bind($form->onError, $form);
                             call_user_func($closure, $message, $element, isset($values[$element]) ? $values[$element] : null);
@@ -168,7 +168,7 @@ $app->serverRequests
     });
 
 $app->clientPackages
-    ->add('form', function (IvoPetkov\BearFrameworkAddons\ClientPackage $package) use ($context) {
+    ->add('form', function (IvoPetkov\BearFrameworkAddons\ClientPackage $package) use ($context): void {
         $code = include $context->dir . '/assets/form.min.js.php';
         //$code = file_get_contents($context->dir . '/dev/form.js');
         $package->addJSCode($code);
@@ -183,7 +183,7 @@ $app->clientPackages
 
         $package->get = 'return ivoPetkov.bearFrameworkAddons.form;';
     })
-    ->add('-form-submit', function (IvoPetkov\BearFrameworkAddons\ClientPackage $package) use ($app, $context) {
+    ->add('-form-submit', function (IvoPetkov\BearFrameworkAddons\ClientPackage $package) use ($app, $context): void {
         //$package->addJSCode(file_get_contents($context->dir . '/assets/public/form-submit.js'));
         $package->addJSFile($context->assets->getURL('assets/public/form-submit.min.js', ['cacheMaxAge' => 999999999, 'version' => 18, 'robotsNoIndex' => true]));
 

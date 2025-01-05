@@ -129,7 +129,7 @@ class Dependencies
         };
         $getValue = function ($name) use ($getElements) {
             $elements = $getElements($name);
-            if (sizeof($elements) > 0) {
+            if (count($elements) > 0) {
                 if ($elements[0]->tagName === 'form-element-radio') {
                     foreach ($elements as $element) {
                         if (strlen((string)$element->getAttribute('checked')) > 0) {
@@ -144,7 +144,7 @@ class Dependencies
         };
         $isChecked = function ($name) use ($getElements) {
             $elements = $getElements($name);
-            if (sizeof($elements) > 0) {
+            if (count($elements) > 0) {
                 if ($elements[0]->tagName === 'form-element-checkbox') {
                     return strlen((string)$elements[0]->getAttribute('checked')) > 0;
                 }

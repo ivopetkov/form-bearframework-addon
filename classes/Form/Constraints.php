@@ -28,7 +28,7 @@ class Constraints
      * @param string $errorMessage Error message
      * @return self Returns a reference to itself.
      */
-    public function setRequired(string $elementName, string $errorMessage = null): self
+    public function setRequired(string $elementName, ?string $errorMessage = null): self
     {
         if ($errorMessage === null) {
             $errorMessage = __('ivopetkov.form.constraint.required');
@@ -45,7 +45,7 @@ class Constraints
      * @param string $errorMessage Error message
      * @return self Returns a reference to itself.
      */
-    public function setNumeric(string $elementName, int $decimalsCount = 0, string $errorMessage = null): self
+    public function setNumeric(string $elementName, int $decimalsCount = 0, ?string $errorMessage = null): self
     {
         if ($errorMessage === null) {
             if ($decimalsCount > 0) {
@@ -65,7 +65,7 @@ class Constraints
      * @param string|null $errorMessage
      * @return self
      */
-    public function setMinNumber(string $elementName, float $value = 0, string $errorMessage = null): self
+    public function setMinNumber(string $elementName, float $value = 0, ?string $errorMessage = null): self
     {
         if ($errorMessage === null) {
             $errorMessage = sprintf(__('ivopetkov.form.constraint.minNumber'), $value);
@@ -81,7 +81,7 @@ class Constraints
      * @param string|null $errorMessage
      * @return self
      */
-    public function setMaxNumber(string $elementName, float $value = 0, string $errorMessage = null): self
+    public function setMaxNumber(string $elementName, float $value = 0, ?string $errorMessage = null): self
     {
         if ($errorMessage === null) {
             $errorMessage = sprintf(__('ivopetkov.form.constraint.maxNumber'), $value);
@@ -98,7 +98,7 @@ class Constraints
      * @param string $errorMessage Error message
      * @return self Returns a reference to itself.
      */
-    public function setMinLength(string $elementName, int $minLength, string $errorMessage = null): self
+    public function setMinLength(string $elementName, int $minLength, ?string $errorMessage = null): self
     {
         if ($errorMessage === null) {
             $errorMessage = sprintf(__('ivopetkov.form.constraint.minLength'), $minLength);
@@ -115,7 +115,7 @@ class Constraints
      * @param string $errorMessage Error message
      * @return self Returns a reference to itself.
      */
-    public function setMaxLength(string $elementName, int $maxLength, string $errorMessage = null): self
+    public function setMaxLength(string $elementName, int $maxLength, ?string $errorMessage = null): self
     {
         if ($errorMessage === null) {
             $errorMessage = sprintf(__('ivopetkov.form.constraint.maxLength'), $maxLength);
@@ -131,7 +131,7 @@ class Constraints
      * @param string $errorMessage Error message
      * @return self Returns a reference to itself.
      */
-    public function setEmail(string $elementName, string $errorMessage = null): self
+    public function setEmail(string $elementName, ?string $errorMessage = null): self
     {
         if ($errorMessage === null) {
             $errorMessage = __('ivopetkov.form.constraint.email');
@@ -147,7 +147,7 @@ class Constraints
      * @param string $errorMessage Error message
      * @return self Returns a reference to itself.
      */
-    public function setPhone(string $elementName, string $errorMessage = null): self
+    public function setPhone(string $elementName, ?string $errorMessage = null): self
     {
         if ($errorMessage === null) {
             $errorMessage = __('ivopetkov.form.constraint.phone');
@@ -164,7 +164,7 @@ class Constraints
      * @param string $errorMessage Error message
      * @return self Returns a reference to itself.
      */
-    public function setRegularExpression(string $elementName, string $regularExpression, string $errorMessage = null): self
+    public function setRegularExpression(string $elementName, string $regularExpression, ?string $errorMessage = null): self
     {
         if ($errorMessage === null) {
             $errorMessage = __('ivopetkov.form.invalid');
@@ -181,7 +181,7 @@ class Constraints
      * @param string $errorMessage Error message
      * @return self Returns a reference to itself.
      */
-    public function setValidator(string $elementName, callable $callback, string $errorMessage = null): self
+    public function setValidator(string $elementName, callable $callback, ?string $errorMessage = null): self
     {
         if ($errorMessage === null) {
             $errorMessage = __('ivopetkov.form.invalid');
